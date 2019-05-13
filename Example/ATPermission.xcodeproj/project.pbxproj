@@ -64,9 +64,9 @@
 		873B8AEA1B1F5CCA007FD442 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Main.storyboard; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		896F068C72D012737F3A83C9 /* Pods-ATPermission_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ATPermission_Tests.debug.xcconfig"; path = "Target Support Files/Pods-ATPermission_Tests/Pods-ATPermission_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		992A4BF50A33FFD0E234368F /* Pods_ATPermission_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ATPermission_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		A037C2ADA8B8331DDD844917 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; name = README.md; path = ../README.md; sourceTree = "<group>"; };
-		E91F1A947D06179C912EE6EF /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
-		F4F415CA375FF7E2F001FCD5 /* ATPermission.podspec */ = {isa = PBXFileReference; includeInIndex = 1; name = ATPermission.podspec; path = ../ATPermission.podspec; sourceTree = "<group>"; };
+		A037C2ADA8B8331DDD844917 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		E91F1A947D06179C912EE6EF /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		F4F415CA375FF7E2F001FCD5 /* ATPermission.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = ATPermission.podspec; path = ../ATPermission.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,7 +103,6 @@
 				896F068C72D012737F3A83C9 /* Pods-ATPermission_Tests.debug.xcconfig */,
 				3C3D0ADB08DB97CE429B4972 /* Pods-ATPermission_Tests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -258,6 +257,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);

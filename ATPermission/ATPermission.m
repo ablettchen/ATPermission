@@ -9,6 +9,17 @@
 
 #import "ATPermission.h"
 
+@interface ATPermission ()
+
+@end
+
 @implementation ATPermission
+
+- (instancetype)init {
+    self = [super init];
+    if (!self) return nil;
+    
+    return self;
+}
 
 @end
