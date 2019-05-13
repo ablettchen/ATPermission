@@ -7,36 +7,24 @@
 #
 
 Pod::Spec.new do |s|
-  s.name             = 'ATPermission'
-  s.version          = '0.1.0'
-  s.summary          = 'A short description of ATPermission.'
+  s.name                    = 'ATPermission'
+  s.version                 = '0.1.0'
+  s.summary                 = '系统权限请求(未完)'
+  s.homepage                = 'https://github.com/ablettchen/ATPermission'
+  s.license                 = { :type => 'MIT', :file => 'LICENSE' }
+  s.author                  = { 'ablett' => 'ablettchen@gmail.com' }
+  s.source                  = { :git => 'https://github.com/ablettchen/ATPermission.git', :tag => s.version.to_s }
+  s.social_media_url        = 'https://twitter.com/ablettchen'
+  s.ios.deployment_target   = '8.0'
 
-# This description is used to generate tags and improve search results.
-#   * Think: What does it do? Why did you write it? What is the focus?
-#   * Try to keep it short, snappy and to the point.
-#   * Write the description between the DESC delimiters below.
-#   * Finally, don't worry about the indent, CocoaPods strips it!
+  s.source_files            = 'ATPermission/**/*.{h,m}'
 
-  s.description      = <<-DESC
-TODO: Add long description of the pod here.
-                       DESC
+# s.public_header_files     = 'ATPermission/**/*.{h}'
+# s.resource                = 'ATPermission/ATPermission.bundle'
 
-  s.homepage         = 'https://github.com/ablettchen@gmail.com/ATPermission'
-  # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
-  s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'ablettchen@gmail.com' => 'ablett.chen@gmail.com' }
-  s.source           = { :git => 'https://github.com/ablettchen@gmail.com/ATPermission.git', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
+  s.requires_arc            = true
+  s.frameworks              = 'UIKit', 'Foundation'
 
-  s.ios.deployment_target = '8.0'
+# s.dependency 'ATCategories'
 
-  s.source_files = 'ATPermission/Classes/**/*'
-  
-  # s.resource_bundles = {
-  #   'ATPermission' => ['ATPermission/Assets/*.png']
-  # }
-
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
 end

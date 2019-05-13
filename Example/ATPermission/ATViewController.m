@@ -1,9 +1,10 @@
 //
 //  ATViewController.m
 //  ATPermission
+//  https://github.com/ablettchen/ATPermission
 //
-//  Created by ablettchen@gmail.com on 05/13/2019.
-//  Copyright (c) 2019 ablettchen@gmail.com. All rights reserved.
+//  Created by ablett on 2019/5/13.
+//  Copyright (c) 2019 ablett. All rights reserved.
 //
 
 #import "ATViewController.h"
@@ -14,14 +15,12 @@
 
 @implementation ATViewController
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
 }
 
-- (void)didReceiveMemoryWarning
-{
+- (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }

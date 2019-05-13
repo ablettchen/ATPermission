@@ -1,9 +1,10 @@
 //
 //  ATAppDelegate.m
 //  ATPermission
+//  https://github.com/ablettchen/ATPermission
 //
-//  Created by ablettchen@gmail.com on 05/13/2019.
-//  Copyright (c) 2019 ablettchen@gmail.com. All rights reserved.
+//  Created by ablett on 2019/5/13.
+//  Copyright (c) 2019 ablett. All rights reserved.
 //
 
 #import "ATAppDelegate.h"
