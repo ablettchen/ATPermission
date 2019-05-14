@@ -43,7 +43,7 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
     self = [super init];
     if (!self) return nil;
     
-    _motionPermissionStatus = unknown;
+    _motionPermissionStatus = kATPermissionStatusUnknown;
     _permissionMessages = [NSMutableArray array];
     _permissionButtons = [NSMutableArray array];
     _permissionLabels = [NSMutableArray array];
@@ -106,39 +106,39 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
 }
 
 - (void)statusForPermission:(enum ATPermissionType)type completion:(ATStatusRequestBlock)completion {
-    ATPermissionStatus permissionStatus = unknown;
+    ATPermissionStatus permissionStatus = kATPermissionStatusUnknown;
     switch (type) {
-        case locationAlways:{
+        case kATPermissionTypeLocationAlways:{
             permissionStatus = [self statusLocationAlways];
         }break;
-        case locationInUse:{
+        case kATPermissionTypeLocationInUse:{
             permissionStatus = [self statusLocationInUse];
         }break;
-        case contacts:{
+        case kATPermissionTypeContacts:{
             
         }break;
-        case notifications:{
+        case kATPermissionTypeNotifications:{
             
         }break;
-        case microphone:{
+        case kATPermissionTypeMicrophone:{
             
         }break;
-        case camera:{
+        case kATPermissionTypeCamera:{
             
         }break;
-        case photos:{
+        case kATPermissionTypePhotos:{
             
         }break;
-        case reminders:{
+        case kATPermissionTypeReminders:{
             
         }break;
-        case events:{
+        case kATPermissionTypeEvents:{
             
         }break;
-        case bluetooth:{
+        case kATPermissionTypeBluetooth:{
             
         }break;
-        case motion:{
+        case kATPermissionTypeMotion:{
             
         }break;
     }
@@ -148,40 +148,40 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
 #pragma mark - Status
 
 - (ATPermissionStatus)statusLocationAlways {
-    if (!CLLocationManager.locationServicesEnabled) {return disabled;}
+    if (!CLLocationManager.locationServicesEnabled) {return kATPermissionStatusDisabled;}
     CLAuthorizationStatus status = CLLocationManager.authorizationStatus;
     switch (status) {
         case kCLAuthorizationStatusAuthorizedAlways:{
-            return authorized;
+            return kATPermissionStatusAuthorized;
         }break;
         case kCLAuthorizationStatusRestricted:
         case kCLAuthorizationStatusDenied:
-            return unauthorized;
+            return kATPermissionStatusUnauthorized;
         case kCLAuthorizationStatusAuthorizedWhenInUse:{
             BOOL value = [self.defaults valueForKey:at_constants.NSUserDefaultsKeys.requestedInUseToAlwaysUpgrade];
             if (value) {
-                return unauthorized;
+                return kATPermissionStatusUnauthorized;
             }else {
-                return unknown;
+                return kATPermissionStatusUnknown;
             }
         }
         case kCLAuthorizationStatusNotDetermined:
-            return unknown;
+            return kATPermissionStatusUnknown;
     }
 }
 
 - (ATPermissionStatus)statusLocationInUse {
-    if (!CLLocationManager.locationServicesEnabled) {return disabled;}
+    if (!CLLocationManager.locationServicesEnabled) {return kATPermissionStatusDisabled;}
     CLAuthorizationStatus status = CLLocationManager.authorizationStatus;
     switch (status) {
         case kCLAuthorizationStatusAuthorizedWhenInUse:
         case kCLAuthorizationStatusAuthorizedAlways:
-            return authorized;
+            return kATPermissionStatusAuthorized;
         case kCLAuthorizationStatusRestricted:
         case kCLAuthorizationStatusDenied:
-            return unauthorized;
+            return kATPermissionStatusUnauthorized;
         case kCLAuthorizationStatusNotDetermined:
-            return unknown;
+            return kATPermissionStatusUnknown;
     }
 }
 

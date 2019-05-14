@@ -11,28 +11,28 @@
 
 NS_INLINE NSString *typeDescription(enum ATPermissionType type) {
     switch (type) {
-        case contacts:         return @"Contacts";
-        case events:           return @"Events";
-        case locationAlways:   return @"LocationAlways";
-        case locationInUse:    return @"LocationInUse";
-        case notifications:    return @"Notifications";
-        case microphone:       return @"Microphone";
-        case camera:           return @"Camera";
-        case photos:           return @"Photos";
-        case reminders:        return @"Reminders";
-        case bluetooth:        return @"Bluetooth";
-        case motion:           return @"Motion";
-        default:               return nil;
+        case kATPermissionTypeContacts:         return @"Contacts";
+        case kATPermissionTypeEvents:           return @"Events";
+        case kATPermissionTypeLocationAlways:   return @"LocationAlways";
+        case kATPermissionTypeLocationInUse:    return @"LocationInUse";
+        case kATPermissionTypeNotifications:    return @"Notifications";
+        case kATPermissionTypeMicrophone:       return @"Microphone";
+        case kATPermissionTypeCamera:           return @"Camera";
+        case kATPermissionTypePhotos:           return @"Photos";
+        case kATPermissionTypeReminders:        return @"Reminders";
+        case kATPermissionTypeBluetooth:        return @"Bluetooth";
+        case kATPermissionTypeMotion:           return @"Motion";
+        default:                                return nil;
     }
 }
 
 NS_INLINE NSString *statusDescription(enum ATPermissionStatus status) {
     switch (status) {
-        case authorized:        return @"Authorized";
-        case unauthorized:      return @"Unauthorized";
-        case unknown:           return @"Unknown";
-        case disabled:          return @"Disabled"; // System-level
-        default:                return nil;
+        case kATPermissionStatusAuthorized:        return @"Authorized";
+        case kATPermissionStatusUnauthorized:      return @"Unauthorized";
+        case kATPermissionStatusUnknown:           return @"Unknown";
+        case kATPermissionStatusDisabled:          return @"Disabled"; // System-level
+        default:                                   return nil;
     }
 }
 

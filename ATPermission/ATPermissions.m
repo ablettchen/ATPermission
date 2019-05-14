@@ -9,7 +9,7 @@
 
 @implementation NotificationsPermission
 - (enum ATPermissionType)type {
-    return notifications;
+    return kATPermissionTypeNotifications;
 }
 
 - (instancetype)initWithNotificationCategories:(NSSet <UIUserNotificationCategory *> *)notificationCategories {
@@ -22,60 +22,60 @@
 
 @implementation LocationWhileInUsePermission
 - (enum ATPermissionType)type {
-    return locationInUse;
+    return kATPermissionTypeLocationInUse;
 }
 @end
 
 @implementation LocationAlwaysPermission
 - (enum ATPermissionType)type {
-    return locationAlways;
+    return kATPermissionTypeLocationAlways;
 }
 @end
 
 @implementation ContactsPermission
 - (enum ATPermissionType)type {
-    return contacts;
+    return kATPermissionTypeContacts;
 }
 @end
 
 @implementation EventsPermission
 - (enum ATPermissionType)type {
-    return events;
+    return kATPermissionTypeEvents;
 }
 @end
 
 @implementation MicrophonePermission
 - (enum ATPermissionType)type {
-    return microphone;
+    return kATPermissionTypeMicrophone;
 }
 @end
 
 @implementation CameraPermission
 - (enum ATPermissionType)type {
-    return camera;
+    return kATPermissionTypeCamera;
 }
 @end
 
 @implementation PhotosPermission
 - (enum ATPermissionType)type {
-    return photos;
+    return kATPermissionTypePhotos;
 }
 @end
 
 @implementation RemindersPermission
 - (enum ATPermissionType)type {
-    return reminders;
+    return kATPermissionTypeReminders;
 }
 @end
 
 @implementation BluetoothPermission
 - (enum ATPermissionType)type {
-    return bluetooth;
+    return kATPermissionTypeBluetooth;
 }
 @end
 
 @implementation MotionPermission
 - (enum ATPermissionType)type {
-    return motion;
+    return kATPermissionTypeMotion;
 }
 @end

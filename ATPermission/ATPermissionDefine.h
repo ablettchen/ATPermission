@@ -11,11 +11,24 @@
 #define ATPermissionDefine_h
 
 typedef NS_ENUM(NSUInteger, ATPermissionType) {
-    contacts, locationAlways, locationInUse, notifications, microphone, camera, photos, reminders, events, bluetooth, motion
+    kATPermissionTypeContacts,
+    kATPermissionTypeLocationAlways,
+    kATPermissionTypeLocationInUse,
+    kATPermissionTypeNotifications,
+    kATPermissionTypeMicrophone,
+    kATPermissionTypeCamera,
+    kATPermissionTypePhotos,
+    kATPermissionTypeReminders,
+    kATPermissionTypeEvents,
+    kATPermissionTypeBluetooth,
+    kATPermissionTypeMotion
 };
 
 typedef NS_ENUM(NSUInteger, ATPermissionStatus) {
-    authorized, unauthorized, unknown, disabled
+    kATPermissionStatusAuthorized,
+    kATPermissionStatusUnauthorized,
+    kATPermissionStatusUnknown,
+    kATPermissionStatusDisabled
 };
 
 typedef struct {
