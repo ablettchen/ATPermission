@@ -13,6 +13,7 @@
 #import <AddressBook/AddressBook.h>
 #import <AVFoundation/AVFoundation.h>
 #import <Photos/Photos.h>
+#import <EventKit/EventKit.h>
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <CoreMotion/CoreMotion.h>
 #import <Contacts/Contacts.h>
@@ -26,7 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ATPermission : NSObject
 
-
+- (void)requestLocationAlways;
+- (void)requestLocationInUse;
 
 @end
 
