@@ -8,12 +8,34 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#import <CoreLocation/CoreLocation.h>
+#import <AddressBook/AddressBook.h>
+#import <AVFoundation/AVFoundation.h>
+#import <Photos/Photos.h>
+#import <CoreBluetooth/CoreBluetooth.h>
+#import <CoreMotion/CoreMotion.h>
+#import <Contacts/Contacts.h>
 #import "ATPermissionDefine.h"
+#import "ATPermissionResult.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ATPermission : NSObject
+@protocol ATPermissionProtocol <NSObject>
+@property (assign, nonatomic, readonly) enum ATPermissionType type;
+@end
 
+@interface NotificationsPermission : NSObject<ATPermissionProtocol>
+@property (assign, nonatomic) NSSet <UIUserNotificationCategory *> *notificationCategories;
+- (instancetype)initWithNotificationCategories:(NSSet <UIUserNotificationCategory *> *)notificationCategories;
+@end
+
+@interface LocationWhileInUsePermission : NSObject<ATPermissionProtocol>
+@end
+
+
+
+@interface ATPermission : NSObject
 
 @end
 

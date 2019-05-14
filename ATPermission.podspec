@@ -23,7 +23,7 @@ Pod::Spec.new do |s|
 # s.resource                = 'ATPermission/ATPermission.bundle'
 
   s.requires_arc            = true
-  s.frameworks              = 'UIKit', 'Foundation'
+# s.frameworks              = 'UIKit', 'Foundation'
 
 # s.dependency 'ATCategories'
 
