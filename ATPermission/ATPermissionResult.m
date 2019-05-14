@@ -1,8 +1,10 @@
 //
 //  ATPermissionResult.m
 //  ATPermission
+//  https://github.com/ablettchen/ATPermission
 //
-//  Created by ablett on 2019/5/14.
+//  Created by ablett on 2019/5/13.
+//  Copyright (c) 2019 ablett. All rights reserved.
 //
 
 #import "ATPermissionResult.h"
@@ -52,6 +54,10 @@ NS_INLINE NSString *statusDescription(enum ATPermissionStatus status) {
     self.type = type;
     self.status = status;
     return self;
+}
+
++ (instancetype)resultWithType:(enum ATPermissionType)type status:(enum ATPermissionStatus)status {
+    return [[ATPermissionResult alloc] initWithType:type status:status];
 }
 
 @end

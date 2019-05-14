@@ -9,40 +9,12 @@
 
 #import "ATPermission.h"
 
-typedef void(^statusRequestBlock)(ATPermissionStatus status);
-typedef void(^authTypeBlock)(BOOL finished, NSArray<ATPermissionResult *> *results);
-typedef void(^cancelTypeBlock)(NSArray<ATPermissionResult *> *results);
-typedef void(^resultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
 
+typedef void(^ATStatusRequestBlock)(ATPermissionStatus status);
+typedef void(^ATAuthTypeBlock)(BOOL finished, NSArray<ATPermissionResult *> *results);
+typedef void(^ATCancelTypeBlock)(NSArray<ATPermissionResult *> *results);
+typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
 
-@implementation NotificationsPermission
-
-#pragma mark - ATPermissionProtocol
-
-- (enum ATPermissionType)type {
-    return notifications;
-}
-
-#pragma mark - public
-
-- (instancetype)initWithNotificationCategories:(NSSet <UIUserNotificationCategory *> *)notificationCategories {
-    self = [super init];
-    if (!self) return nil;
-    self.notificationCategories = notificationCategories;
-    return self;
-}
-
-@end;
-
-@implementation LocationWhileInUsePermission
-
-#pragma mark - ATPermissionProtocol
-
-- (enum ATPermissionType)type {
-    return locationInUse;
-}
-
-@end
 
 @interface ATPermission ()<CLLocationManagerDelegate, CBPeripheralManagerDelegate>
 @property (strong, nonatomic) NSMutableArray <NSString *> *permissionMessages;
@@ -53,7 +25,15 @@ typedef void(^resultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
 @property (strong, nonatomic) NSUserDefaults *defaults;
 
 @property (assign, nonatomic) ATPermissionStatus motionPermissionStatus;
-@property (strong, nonatomic) NSMutableArray <NSObject<ATPermissionProtocol> *> *configuredPermissions;
+@property (strong, nonatomic) NSMutableArray <__kindof NSObject<ATPermissionProtocol> *> *configuredPermissions;
+@property (strong, nonatomic) NSMutableArray <UIButton *> *permissionButtons;
+@property (strong, nonatomic) NSMutableArray <UILabel *> *permissionLabels;
+
+@property (copy, nonatomic) ATStatusRequestBlock onAuthChange;
+@property (copy, nonatomic) ATCancelTypeBlock onCancel;
+@property (copy, nonatomic) ATCancelTypeBlock onDisabledOrDenied;
+
+@property (strong, nonatomic) UIViewController *viewControllerForAlerts;
 
 @end
 
@@ -62,8 +42,12 @@ typedef void(^resultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
 - (instancetype)init {
     self = [super init];
     if (!self) return nil;
-    _permissionMessages = [NSMutableArray array];
+    
     _motionPermissionStatus = unknown;
+    _permissionMessages = [NSMutableArray array];
+    _permissionButtons = [NSMutableArray array];
+    _permissionLabels = [NSMutableArray array];
+    
     
     return self;
 }
@@ -110,6 +94,97 @@ typedef void(^resultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
 }
 
 #pragma mark -
+
+- (void)getResultsForConfig:(ATResultsForConfigBlock)completionBlock {
+    NSMutableArray <ATPermissionResult *> *results = [NSMutableArray array];
+    for (__kindof NSObject<ATPermissionProtocol> *config in self.configuredPermissions) {
+        [self statusForPermission:config.type completion:^(ATPermissionStatus status) {
+            ATPermissionResult *result = ATPermissionResultMake(config.type, status);
+            [results addObject:result];
+        }];
+    }
+}
+
+- (void)statusForPermission:(enum ATPermissionType)type completion:(ATStatusRequestBlock)completion {
+    ATPermissionStatus permissionStatus = unknown;
+    switch (type) {
+        case locationAlways:{
+            permissionStatus = [self statusLocationAlways];
+        }break;
+        case locationInUse:{
+            permissionStatus = [self statusLocationInUse];
+        }break;
+        case contacts:{
+            
+        }break;
+        case notifications:{
+            
+        }break;
+        case microphone:{
+            
+        }break;
+        case camera:{
+            
+        }break;
+        case photos:{
+            
+        }break;
+        case reminders:{
+            
+        }break;
+        case events:{
+            
+        }break;
+        case bluetooth:{
+            
+        }break;
+        case motion:{
+            
+        }break;
+    }
+    completion(permissionStatus);
+}
+
+#pragma mark - Status
+
+- (ATPermissionStatus)statusLocationAlways {
+    if (!CLLocationManager.locationServicesEnabled) {return disabled;}
+    CLAuthorizationStatus status = CLLocationManager.authorizationStatus;
+    switch (status) {
+        case kCLAuthorizationStatusAuthorizedAlways:{
+            return authorized;
+        }break;
+        case kCLAuthorizationStatusRestricted:
+        case kCLAuthorizationStatusDenied:
+            return unauthorized;
+        case kCLAuthorizationStatusAuthorizedWhenInUse:{
+            BOOL value = [self.defaults valueForKey:at_constants.NSUserDefaultsKeys.requestedInUseToAlwaysUpgrade];
+            if (value) {
+                return unauthorized;
+            }else {
+                return unknown;
+            }
+        }
+        case kCLAuthorizationStatusNotDetermined:
+            return unknown;
+    }
+}
+
+- (ATPermissionStatus)statusLocationInUse {
+    if (!CLLocationManager.locationServicesEnabled) {return disabled;}
+    CLAuthorizationStatus status = CLLocationManager.authorizationStatus;
+    switch (status) {
+        case kCLAuthorizationStatusAuthorizedWhenInUse:
+        case kCLAuthorizationStatusAuthorizedAlways:
+            return authorized;
+        case kCLAuthorizationStatusRestricted:
+        case kCLAuthorizationStatusDenied:
+            return unauthorized;
+        case kCLAuthorizationStatusNotDetermined:
+            return unknown;
+    }
+}
+
 #pragma mark -
 #pragma mark -
 #pragma mark -

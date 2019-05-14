@@ -18,24 +18,15 @@
 #import <Contacts/Contacts.h>
 #import "ATPermissionDefine.h"
 #import "ATPermissionResult.h"
+#import "ATPermissionProtocol.h"
+#import "ATPermissions.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol ATPermissionProtocol <NSObject>
-@property (assign, nonatomic, readonly) enum ATPermissionType type;
-@end
-
-@interface NotificationsPermission : NSObject<ATPermissionProtocol>
-@property (assign, nonatomic) NSSet <UIUserNotificationCategory *> *notificationCategories;
-- (instancetype)initWithNotificationCategories:(NSSet <UIUserNotificationCategory *> *)notificationCategories;
-@end
-
-@interface LocationWhileInUsePermission : NSObject<ATPermissionProtocol>
-@end
-
-
 
 @interface ATPermission : NSObject
+
+
 
 @end
 
