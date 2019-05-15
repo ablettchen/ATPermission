@@ -7,7 +7,6 @@ target 'ATPermission_Example' do
 
   target 'ATPermission_Tests' do
     inherit! :search_paths
-
-    
   end
+  
 end
