@@ -75,6 +75,7 @@
     _viewControllerForAlerts = self;
     
     _motionPermissionStatus = kATPermissionStatusUnknown;
+    _configuredPermissions = [NSMutableArray array];
     _permissionMessages = [NSMutableDictionary dictionary];
     _permissionButtons = [NSMutableArray array];
     _permissionLabels = [NSMutableArray array];
@@ -334,6 +335,31 @@
             self.notificationTimer = nil;
         }
     });
+}
+
+- (void)show:(ATAuthTypeBlock)authChange cancelled:(ATCancelTypeBlock)cancelled {
+    
+    NSAssert((self.configuredPermissions.count != 0), @"Please add at least one permission");
+    self.onAuthChange = authChange;
+    self.onCancel = cancelled;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        while (self.waitingForBluetooth || self.waitingForMotion) {}
+        [self allAuthorized:^(BOOL areAuthorized) {
+            if (areAuthorized) {
+                [self getResultsForConfig:^(NSArray<ATPermissionResult *> * _Nonnull results) {
+                    if (self.onAuthChange) {
+                        self.onAuthChange(YES, results);
+                    }
+                }];
+            }else {
+                [self showAlert];
+            }
+        }];
+        
+    });
+    
 }
 
 /** Creates the modal viewcontroller and shows it. */

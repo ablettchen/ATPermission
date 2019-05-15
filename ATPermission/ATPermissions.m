@@ -12,7 +12,7 @@
     return kATPermissionTypeNotifications;
 }
 
-- (instancetype)initWithNotificationCategories:(NSSet <UIUserNotificationCategory *> *)notificationCategories {
+- (instancetype)initWithNotificationCategories:(nullable NSSet <UIUserNotificationCategory *> *)notificationCategories {
     self = [super init];
     if (!self) return nil;
     self.notificationCategories = notificationCategories;

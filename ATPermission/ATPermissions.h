@@ -15,8 +15,8 @@ typedef void(^requestPermissionUnknownResult)(void);
 typedef void(^requestPermissionShowAlert)(ATPermissionType type);
 
 @interface ATNotificationsPermission : NSObject<ATPermissionProtocol>
-@property (assign, nonatomic) NSSet <UIUserNotificationCategory *> *notificationCategories;
-- (instancetype)initWithNotificationCategories:(NSSet <UIUserNotificationCategory *> *)notificationCategories;
+@property (assign, nonatomic, nullable) NSSet <UIUserNotificationCategory *> *notificationCategories;
+- (instancetype)initWithNotificationCategories:(nullable NSSet <UIUserNotificationCategory *> *)notificationCategories;
 @end
 
 @interface ATLocationWhileInUsePermission : NSObject<ATPermissionProtocol> @end
