@@ -29,7 +29,7 @@
 @property (strong, nonatomic) UIFont *labelFont;
 
 @property (strong, nonatomic) UIButton *closeButton;
-@property (assign, nonatomic) CGPoint closeOffset;
+@property (assign, nonatomic) CGSize closeOffset;
 
 @property (strong, nonatomic) UIColor *authorizedButtonColor;
 @property (strong, nonatomic) UIColor *unauthorizedButtonColor;
@@ -81,6 +81,56 @@
     _waitingForBluetooth = NO;
     _waitingForMotion = NO;
     
+    // Set up main view
+    self.view.frame = [UIScreen mainScreen].bounds;
+    self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.view.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.7];
+    [self.view addSubview:self.baseView];
+    
+    // Base View
+    self.baseView.frame = self.view.frame;
+    [self.baseView addSubview:self.contentView];
+    
+    if (backgroundTapCancels) {
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cancel)];
+        tap.delegate = self;
+        [self.baseView addGestureRecognizer:tap];
+    }
+    
+    // Content View
+    self.contentView.backgroundColor = [UIColor whiteColor];
+    self.contentView.layer.cornerRadius = 10;
+    self.contentView.layer.masksToBounds = true;
+    self.contentView.layer.borderWidth = 0.5f;
+    
+    // header label
+    self.headerLabel.font = [UIFont systemFontOfSize:22];
+    self.headerLabel.textColor = [UIColor blackColor];
+    self.headerLabel.textAlignment = NSTextAlignmentCenter;
+    self.headerLabel.text = @"Hey, listen!".localized;
+    self.headerLabel.accessibilityIdentifier = @"permissionscope.headerlabel";
+    
+    [self.contentView addSubview:self.headerLabel];
+    
+    // body label
+    self.bodyLabel.font = [UIFont systemFontOfSize:16];
+    self.bodyLabel.textColor =[UIColor blackColor];
+    self.bodyLabel.textAlignment = NSTextAlignmentCenter;
+    self.bodyLabel.text = @"We need a couple things\r\nbefore you get started.".localized;
+    self.bodyLabel.numberOfLines = 2;
+    self.bodyLabel.accessibilityIdentifier = @"permissionscope.bodylabel";
+    
+    [self.contentView addSubview:self.bodyLabel];
+    
+    // close button
+    [self.closeButton setTitle:@"Close".localized forState:UIControlStateNormal];
+    [self.closeButton addTarget:self action:@selector(cancel) forControlEvents:UIControlEventTouchUpInside];
+    self.closeButton.accessibilityIdentifier = @"permissionscope.closeButton";
+    
+    [self.contentView addSubview:self.closeButton];
+    
+    [self statusMotion];
+    
     return self;
 }
 
@@ -91,8 +141,75 @@
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
     
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
+    self.view.at_size = screenSize;
     
+    CGFloat x = (screenSize.width - at_constants.UI.contentWidth) / 2.f;
+    CGFloat dialogHeight;
+    switch (self.configuredPermissions.count) {
+        case 2:{
+            dialogHeight = at_constants.UI.dialogHeightTwoPermissions;
+        }break;
+        case 3:{
+            dialogHeight = at_constants.UI.dialogHeightThreePermissions;
+        }break;
+        default:{
+            dialogHeight = at_constants.UI.dialogHeightSinglePermission;
+        }break;
+    }
+    CGFloat y = (screenSize.height - dialogHeight) / 2.f;
+    self.contentView.frame = CGRectMake(x, y, at_constants.UI.contentWidth, dialogHeight);
     
+    self.headerLabel.center = self.contentView.center;
+    self.headerLabel.frame = CGRectOffset(self.headerLabel.frame, -self.contentView.frame.origin.x, -self.contentView.frame.origin.y);
+    self.headerLabel.frame = CGRectOffset(self.headerLabel.frame, 0, -((dialogHeight/2)-50));
+    
+    self.bodyLabel.center = self.contentView.center;
+    self.bodyLabel.frame = CGRectOffset(self.bodyLabel.frame, -self.contentView.frame.origin.x, -self.contentView.frame.origin.y);
+    self.bodyLabel.frame = CGRectOffset(self.bodyLabel.frame, 0, -((dialogHeight/2)-100));
+    
+    self.closeButton.center = self.contentView.center;
+    self.closeButton.frame = CGRectOffset(self.closeButton.frame, -self.contentView.frame.origin.x, -self.contentView.frame.origin.y);
+    self.closeButton.frame = CGRectOffset(self.closeButton.frame, 105, -((dialogHeight/2)-20));
+    self.closeButton.frame = CGRectOffset(self.closeButton.frame, self.closeOffset.width, self.closeOffset.height);
+    
+    if (self.closeButton.imageView.image) {
+        [self.closeButton setTitle:@"" forState:UIControlStateNormal];
+    }
+    [self.closeButton setTitleColor:self.closeButtonTextColor forState:UIControlStateNormal];
+    
+    CGFloat baseOffset = 95.f;
+    __block NSInteger index = 0;
+    for (UIButton *button in self.permissionButtons) {
+        button.center = self.contentView.center;
+        button.frame = CGRectOffset(button.frame, -self.contentView.frame.origin.x, -self.contentView.frame.origin.y);
+        button.frame = CGRectOffset(button.frame, 0, -((dialogHeight/2)-160) + (index * baseOffset));
+        
+        ATPermissionType type = self.configuredPermissions[index].type;
+        
+        [self statusForPermission:type completion:^(ATPermissionStatus currentStatus) {
+            NSString *prettyDescription = ATPermissionTypePrettyDescription(type);
+            if (currentStatus == kATPermissionStatusAuthorized) {
+                [self setButtonAuthorizedStyle:button];
+                NSString *title = [NSString stringWithFormat:@"Allowed %@", prettyDescription].localized.uppercaseString;
+                [button setTitle:title forState:UIControlStateNormal];
+            }else if (currentStatus == kATPermissionStatusUnauthorized) {
+                [self setButtonUnauthorizedStyle:button];
+                NSString *title = [NSString stringWithFormat:@"Denied %@", prettyDescription].localized.uppercaseString;
+                [button setTitle:title forState:UIControlStateNormal];
+            }else if (currentStatus == kATPermissionStatusDisabled) {
+                NSString *title = [NSString stringWithFormat:@"%@ Disabled", prettyDescription].localized.uppercaseString;
+                [button setTitle:title forState:UIControlStateNormal];
+            }
+            
+            UILabel *label = self.permissionLabels[index];
+            label.center = self.contentView.center;
+            label.frame = CGRectOffset(label.frame, -self.contentView.frame.origin.x, -self.contentView.frame.origin.y);
+            label.frame = CGRectOffset(label.frame, 0, -((dialogHeight/2)-205) + (index * baseOffset));
+            
+            index = index + 1;
+        }];
+    }
 }
 
 #pragma mark - setter, getter;
@@ -142,6 +259,18 @@
 }
 
 #pragma mark - privite
+
+- (void)setButtonAuthorizedStyle:(UIButton *)button {
+    button.layer.borderWidth = 0;
+    button.backgroundColor = self.authorizedButtonColor;
+    [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+}
+
+- (void)setButtonUnauthorizedStyle:(UIButton *)button {
+    button.layer.borderWidth = 0;
+    button.backgroundColor = self.unauthorizedButtonColor?:[self.authorizedButtonColor inverseColor];
+    [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+}
 
 - (UIButton *)permissionStyledButton:(enum ATPermissionType)type {
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 220, 40)];
