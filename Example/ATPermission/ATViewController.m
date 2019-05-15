@@ -13,6 +13,7 @@
 
 @interface ATViewController ()
 @property (nonatomic, strong) ATPermission *singlePermission;
+@property (nonatomic, strong) ATPermission *multiPermission;
 @end
 
 @implementation ATViewController
@@ -22,17 +23,33 @@
 	// Do any additional setup after loading the view, typically from a nib.
     
     self.singlePermission = [ATPermission new];
-    [self.singlePermission addPermission:[ATPhotosPermission new] message:@"hello"];
+    self.multiPermission = [ATPermission new];
     
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.view addSubview:button];
+    [self.singlePermission addPermission:[[ATNotificationsPermission alloc] initWithNotificationCategories:nil]
+                                 message:@"We use this to send you\r\nspam and love notes"];
     
-    button.at_size = CGSizeMake(200, 60);
-    button.center = self.view.center;
-    [button setTitle:@"Photos" forState:UIControlStateNormal];
-    [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [button.titleLabel setFont:[UIFont systemFontOfSize:18]];
+    [self.multiPermission addPermission:[[ATContactsPermission alloc] init]
+                                message:@"We use this to steal\r\nyour friends"];
+    [self.multiPermission addPermission:[[ATLocationWhileInUsePermission alloc] init]
+                                message:@"We use this to track\r\nwhere you live"];
+    
+    [self.multiPermission addPermission:[[ATMicrophonePermission alloc] init]
+                                message:@"We use this to record to evaluating word pronunciation"];
+    
+    
+    UIButton *button = ({
+        UIButton *view = [UIButton buttonWithType:UIButtonTypeCustom];
+        [self.view addSubview:view];
+        view.at_size = CGSizeMake(200, 60);
+        view.center = self.view.center;
+        [view setTitle:@"Action" forState:UIControlStateNormal];
+        [view setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [view.titleLabel setFont:[UIFont systemFontOfSize:18]];
+        view;
+    });
+    
     [button addTarget:self action:@selector(demoAction:) forControlEvents:UIControlEventTouchUpInside];
+    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -41,22 +58,21 @@
 }
 
 - (void)demoAction:(UIButton *)sender {
+
+    [self.singlePermission show:^(BOOL finished, NSArray<ATPermissionResult *> * _Nonnull results) {
+        NSLog(@"Changed: %@ - %@", @(finished), results);
+    } cancelled:^(NSArray<ATPermissionResult *> * _Nonnull results) {
+        NSLog(@"Cancelled");
+    }];
     
+    /*
     [self.singlePermission statusForPermission:kATPermissionTypeMicrophone completion:^(ATPermissionStatus status) {
         NSLog(@"%@", ATPermissionStatusDescription(status));
         if (status != kATPermissionStatusAuthorized) {
             [self.singlePermission requestMicrophone];
         }
     }];
-    
-    
-    
-    
-//    [self.singlePermission show:^(BOOL finished, NSArray<ATPermissionResult *> * _Nonnull results) {
-//
-//    } cancelled:^(NSArray<ATPermissionResult *> * _Nonnull results) {
-//
-//    }];
+     */
 }
 
 @end

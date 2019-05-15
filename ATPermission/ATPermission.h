@@ -35,6 +35,18 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
 - (void)statusForPermission:(enum ATPermissionType)type completion:(ATStatusRequestBlock)completion;
 - (void)show:(ATAuthTypeBlock)authChange cancelled:(ATCancelTypeBlock)cancelled;
 
+- (ATPermissionStatus)statusLocationAlways;
+- (ATPermissionStatus)statusLocationInUse;
+- (ATPermissionStatus)statusContacts;
+- (ATPermissionStatus)statusNotifications;
+- (ATPermissionStatus)statusMicrophone;
+- (ATPermissionStatus)statusCamera;
+- (ATPermissionStatus)statusPhotos;
+- (ATPermissionStatus)statusReminders;
+- (ATPermissionStatus)statusEvents;
+- (ATPermissionStatus)statusBluetooth;
+- (ATPermissionStatus)statusMotion;
+
 - (void)requestLocationAlways;
 - (void)requestLocationInUse;
 - (void)requestContacts;

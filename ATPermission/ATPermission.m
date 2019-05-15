@@ -74,13 +74,30 @@
     
     _viewControllerForAlerts = self;
     
-    _motionPermissionStatus = kATPermissionStatusUnknown;
-    _configuredPermissions = [NSMutableArray array];
-    _permissionMessages = [NSMutableDictionary dictionary];
-    _permissionButtons = [NSMutableArray array];
-    _permissionLabels = [NSMutableArray array];
-    _waitingForBluetooth = NO;
-    _waitingForMotion = NO;
+    _motionPermissionStatus     	= kATPermissionStatusUnknown;
+    _configuredPermissions          = [NSMutableArray array];
+    _permissionMessages             = [NSMutableDictionary dictionary];
+    _permissionButtons              = [NSMutableArray array];
+    _permissionLabels               = [NSMutableArray array];
+    _waitingForBluetooth            = NO;
+    _waitingForMotion               = NO;
+    
+    _headerLabel                    = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 50)];
+    _bodyLabel                      = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 240, 70)];
+    _closeButtonTextColor           = [UIColor colorWithRed:0 green:0.47 blue:1 alpha:1];
+    _permissionButtonTextColor      = [UIColor colorWithRed:0 green:0.47 blue:1 alpha:1];
+    _permissionButtonBorderColor    = [UIColor colorWithRed:0 green:0.47 blue:1 alpha:1];
+    _permissionButtonBorderWidth    = 1.f;
+    _permissionButtonCornerRadius   = 6.f;
+    _permissionLabelColor           = [UIColor blackColor];
+    _buttonFont                     = [UIFont boldSystemFontOfSize:14];
+    _labelFont                      = [UIFont systemFontOfSize:14];
+    _closeButton                    = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 50, 32)];
+    _closeOffset                    = CGSizeZero;
+    _authorizedButtonColor          = [UIColor colorWithRed:0 green:0.47 blue:1 alpha:1];
+    
+    _baseView                       = [UIView new];
+    _contentView                    = [UIView new];
     
     // Set up main view
     self.view.frame = [UIScreen mainScreen].bounds;
@@ -344,7 +361,6 @@
     self.onCancel = cancelled;
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        
         while (self.waitingForBluetooth || self.waitingForMotion) {}
         [self allAuthorized:^(BOOL areAuthorized) {
             if (areAuthorized) {
@@ -357,9 +373,7 @@
                 [self showAlert];
             }
         }];
-        
     });
-    
 }
 
 /** Creates the modal viewcontroller and shows it. */
@@ -372,6 +386,7 @@
     
     [window addSubview:self.view];
     self.view.frame = window.bounds;
+    self.baseView.frame = window.bounds;
     
     for (UIButton *button in self.permissionButtons) {
         [button removeFromSuperview];
@@ -523,7 +538,7 @@
         BOOL result;
         if (results.firstObject) {
             ATPermissionResult *obj = results.firstObject;
-            result = (obj.status != kATPermissionStatusAuthorized);
+            result = (obj.status != kATPermissionStatusAuthorized)?NO:YES;
         }else {
             result = NO;
         }
@@ -539,6 +554,7 @@
             [results addObject:result];
         }];
     }
+    completionBlock(results);
 }
 
 - (void)statusForPermission:(enum ATPermissionType)type completion:(ATStatusRequestBlock)completion {
