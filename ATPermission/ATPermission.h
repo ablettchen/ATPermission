@@ -24,9 +24,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void(^ATStatusRequestBlock)(ATPermissionStatus status);
+typedef void(^ATAuthTypeBlock)(BOOL finished, NSArray<ATPermissionResult *> *results);
+typedef void(^ATCancelTypeBlock)(NSArray<ATPermissionResult *> *results);
+typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
 
 @interface ATPermission : NSObject
 
+- (void)statusForPermission:(enum ATPermissionType)type completion:(ATStatusRequestBlock)completion;
 - (void)requestLocationAlways;
 - (void)requestLocationInUse;
 

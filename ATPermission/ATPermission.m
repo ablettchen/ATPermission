@@ -9,13 +9,6 @@
 
 #import "ATPermission.h"
 
-
-typedef void(^ATStatusRequestBlock)(ATPermissionStatus status);
-typedef void(^ATAuthTypeBlock)(BOOL finished, NSArray<ATPermissionResult *> *results);
-typedef void(^ATCancelTypeBlock)(NSArray<ATPermissionResult *> *results);
-typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
-
-
 @interface ATPermission ()<CLLocationManagerDelegate, CBPeripheralManagerDelegate>
 @property (strong, nonatomic) NSMutableArray <NSString *> *permissionMessages;
 
@@ -39,6 +32,8 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
 @property (assign, nonatomic) BOOL waitingForBluetooth;
 @property (assign, nonatomic) BOOL askedMotion;
 @property (assign, nonatomic) BOOL waitingForMotion;
+
+@property (strong, nonatomic) NSTimer *notificationTimer;
 
 @end
 
@@ -240,7 +235,9 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
     }];
 }
 
-#pragma mark - ATPermissionStatus
+#pragma mark - ATPermissionStatus and Request
+
+#pragma mark - LocationAlways
 
 - (ATPermissionStatus)statusLocationAlways {
     if (!CLLocationManager.locationServicesEnabled) {return kATPermissionStatusDisabled;}
@@ -265,6 +262,32 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
     }
 }
 
+- (void)requestLocationAlways {
+    BOOL hasAlwaysKey = [[NSBundle mainBundle] objectForInfoDictionaryKey:at_constants.InfoPlistKeys.locationAlways]?YES:NO;
+    NSString *desc = [NSString stringWithFormat:@"%@  not found in Info.plist.", at_constants.InfoPlistKeys.locationAlways];
+    NSAssert(hasAlwaysKey, desc);
+    ATPermissionStatus status = [self statusLocationAlways];
+    switch (status) {
+        case kATPermissionStatusUnknown:{
+            if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse) {
+                [self.defaults setBool:YES forKey:at_constants.NSUserDefaultsKeys.requestedInUseToAlwaysUpgrade];
+                [self.defaults synchronize];
+            }
+            [self.locationManager requestAlwaysAuthorization];
+        }break;
+        case kATPermissionStatusUnauthorized:{
+            [self showDeniedAlert:kATPermissionTypeLocationAlways];
+        }break;
+        case kATPermissionStatusDisabled:{
+            [self showDisabledAlert:kATPermissionTypeLocationInUse];
+        }break;
+        default:
+            break;
+    }
+}
+
+#pragma mark - LocationInUse
+
 - (ATPermissionStatus)statusLocationInUse {
     if (!CLLocationManager.locationServicesEnabled) {return kATPermissionStatusDisabled;}
     CLAuthorizationStatus status = CLLocationManager.authorizationStatus;
@@ -279,6 +302,28 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
             return kATPermissionStatusUnknown;
     }
 }
+
+- (void)requestLocationInUse {
+    BOOL hasWhenInUseKey = [[NSBundle mainBundle] objectForInfoDictionaryKey:at_constants.InfoPlistKeys.locationAlways]?YES:NO;
+    NSString *desc = [NSString stringWithFormat:@"%@  not found in Info.plist.", at_constants.InfoPlistKeys.locationWhenInUse];
+    NSAssert(hasWhenInUseKey, desc);
+    ATPermissionStatus status = [self statusLocationInUse];
+    switch (status) {
+        case kATPermissionStatusUnknown:{
+            [self.locationManager requestWhenInUseAuthorization];
+        }break;
+        case kATPermissionStatusUnauthorized:{
+            [self showDeniedAlert:kATPermissionTypeLocationInUse];
+        }break;
+        case kATPermissionStatusDisabled:{
+            [self showDisabledAlert:kATPermissionTypeLocationInUse];
+        }break;
+        default:
+            break;
+    }
+}
+
+#pragma mark - Contacts
 
 - (ATPermissionStatus)statusContacts {
     if (@available(iOS 9.0, *)) {
@@ -306,6 +351,30 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
     }
 }
 
+- (void)requestContacts {
+    ATPermissionStatus status = [self statusContacts];
+    switch (status) {
+        case kATPermissionStatusUnknown:{
+            if (@available(iOS 9.0, *)) {
+                [[CNContactStore new] requestAccessForEntityType:CNEntityTypeContacts completionHandler:^(BOOL granted, NSError * _Nullable error) {
+                    [self detectAndCallback];
+                 }];
+            }else {
+                ABAddressBookRequestAccessWithCompletion(nil, ^(bool granted, CFErrorRef error) {
+                    [self detectAndCallback];
+                });
+            }
+        }break;
+        case kATPermissionStatusUnauthorized:{
+            [self showDisabledAlert:kATPermissionTypeContacts];
+        }break;
+        default:
+            break;
+    }
+}
+
+#pragma mark - Notifications
+
 - (ATPermissionStatus)statusNotifications {
     UIUserNotificationSettings *setting = UIApplication.sharedApplication.currentUserNotificationSettings;
     UIUserNotificationType settingTypes = setting.types;
@@ -320,6 +389,64 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
     }
 }
 
+- (void)showingNotificationPermission {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(finishedShowingNotificationPermission) name:UIApplicationDidBecomeActiveNotification object:nil];
+    if (self.notificationTimer) {[self.notificationTimer invalidate];}
+}
+
+- (void)finishedShowingNotificationPermission {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
+    if (self.notificationTimer) {[self.notificationTimer invalidate];}
+    [self.defaults setBool:YES forKey:at_constants.NSUserDefaultsKeys.requestedNotifications];
+    [self.defaults synchronize];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(100 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
+        [self getResultsForConfig:^(NSArray<ATPermissionResult *> * _Nonnull results) {
+            ATPermissionResult *obj = results.firstObject;
+            if (obj && obj.type == kATPermissionTypeNotifications) {}else {return;}
+            if (obj.status == kATPermissionStatusUnknown) {
+                [self showDeniedAlert:obj.type];
+            }else {
+                [self detectAndCallback];
+            }
+        }];
+    });
+}
+
+- (void)requestNotifications {
+    ATPermissionStatus status = [self statusNotifications];
+    switch (status) {
+        case kATPermissionStatusUnknown:{
+            ATNotificationsPermission *notificationsPermission;
+            if ([self.configuredPermissions.firstObject isKindOfClass:[ATNotificationsPermission class]]) {
+                notificationsPermission = self.configuredPermissions.firstObject;
+            }
+            NSSet *notificationsPermissionSet = notificationsPermission.notificationCategories;
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showingNotificationPermission) name:UIApplicationWillResignActiveNotification object:nil];
+            self.notificationTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(finishedShowingNotificationPermission) userInfo:nil repeats:YES];
+            UIUserNotificationType type = UIUserNotificationTypeBadge|UIUserNotificationTypeSound|UIUserNotificationTypeAlert;
+            UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:type categories:notificationsPermissionSet];
+            [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
+        }break;
+        case kATPermissionStatusUnauthorized:{
+            [self showDisabledAlert:kATPermissionTypeNotifications];
+        }break;
+        case kATPermissionStatusDisabled:{
+            [self showDisabledAlert:kATPermissionTypeNotifications];
+        }break;
+        case kATPermissionStatusAuthorized:{
+            [self detectAndCallback];
+        }break;
+        default:
+            break;
+    }
+}
+
+
+
+#pragma mark - Microphone
+
 - (ATPermissionStatus)statusMicrophone {
     AVAudioSessionRecordPermission recordPermission = AVAudioSession.sharedInstance.recordPermission;
     switch (recordPermission) {
@@ -331,6 +458,8 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
             return kATPermissionStatusUnknown;
     }
 }
+
+#pragma mark - Camera
 
 - (ATPermissionStatus)statusCamera {
     AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
@@ -345,6 +474,8 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
     }
 }
 
+#pragma mark - Photos
+
 - (ATPermissionStatus)statusPhotos {
     PHAuthorizationStatus status = PHPhotoLibrary.authorizationStatus;
     switch (status) {
@@ -357,6 +488,8 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
             return kATPermissionStatusUnknown;
     }
 }
+
+#pragma mark - Reminders
 
 - (ATPermissionStatus)statusReminders {
     EKAuthorizationStatus status = [EKEventStore authorizationStatusForEntityType:EKEntityTypeReminder];
@@ -371,6 +504,8 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
     }
 }
 
+#pragma mark - Events
+
 - (ATPermissionStatus)statusEvents {
     EKAuthorizationStatus status = [EKEventStore authorizationStatusForEntityType:EKEntityTypeEvent];
     switch (status) {
@@ -383,6 +518,8 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
             return kATPermissionStatusUnknown;
     }
 }
+
+#pragma mark - Bluetooth
 
 - (ATPermissionStatus)statusBluetooth {
     if (self.askedBluetooth) {
@@ -412,6 +549,8 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
     }
 }
 
+#pragma mark - Motion
+
 - (ATPermissionStatus)statusMotion {
     if (self.askedMotion) {
         [self triggerMotionStatusUpdate];
@@ -419,35 +558,7 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
     return self.motionPermissionStatus;
 }
 
-#pragma mark - Request Permission
-
-- (void)requestLocationAlways {
-    BOOL hasAlwaysKey = [[NSBundle mainBundle] objectForInfoDictionaryKey:at_constants.InfoPlistKeys.locationAlways]?YES:NO;
-    NSString *desc = [NSString stringWithFormat:@"%@  not found in Info.plist.", at_constants.InfoPlistKeys.locationAlways];
-    NSAssert(hasAlwaysKey, desc);
-    ATPermissionStatus status = [self statusLocationAlways];
-    switch (status) {
-        case kATPermissionStatusUnknown:{
-            if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse) {
-                [self.defaults setBool:YES forKey:at_constants.NSUserDefaultsKeys.requestedInUseToAlwaysUpgrade];
-                [self.defaults synchronize];
-            }
-            [self.locationManager requestAlwaysAuthorization];
-        }break;
-        case kATPermissionStatusUnauthorized:{
-            [self showDeniedAlert:kATPermissionTypeLocationAlways];
-        }break;
-        case kATPermissionStatusDisabled:{
-            [self showDisabledAlert:kATPermissionTypeLocationInUse];
-        }break;
-        default:
-            break;
-    }
-}
-
-- (void)requestLocationInUse {
-    
-}
+#pragma mark -
 
 #pragma mark -
 #pragma mark -

@@ -10,6 +10,7 @@
 #ifndef ATPermissionDefine_h
 #define ATPermissionDefine_h
 
+
 typedef NS_ENUM(NSUInteger, ATPermissionType) {
     kATPermissionTypeContacts,
     kATPermissionTypeLocationAlways,

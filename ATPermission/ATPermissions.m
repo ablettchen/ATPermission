@@ -7,7 +7,7 @@
 
 #import "ATPermissions.h"
 
-@implementation NotificationsPermission
+@implementation ATNotificationsPermission
 - (enum ATPermissionType)type {
     return kATPermissionTypeNotifications;
 }
@@ -20,61 +20,61 @@
 }
 @end;
 
-@implementation LocationWhileInUsePermission
+@implementation ATLocationWhileInUsePermission
 - (enum ATPermissionType)type {
     return kATPermissionTypeLocationInUse;
 }
 @end
 
-@implementation LocationAlwaysPermission
+@implementation ATLocationAlwaysPermission
 - (enum ATPermissionType)type {
     return kATPermissionTypeLocationAlways;
 }
 @end
 
-@implementation ContactsPermission
+@implementation ATContactsPermission
 - (enum ATPermissionType)type {
     return kATPermissionTypeContacts;
 }
 @end
 
-@implementation EventsPermission
+@implementation ATEventsPermission
 - (enum ATPermissionType)type {
     return kATPermissionTypeEvents;
 }
 @end
 
-@implementation MicrophonePermission
+@implementation ATMicrophonePermission
 - (enum ATPermissionType)type {
     return kATPermissionTypeMicrophone;
 }
 @end
 
-@implementation CameraPermission
+@implementation ATCameraPermission
 - (enum ATPermissionType)type {
     return kATPermissionTypeCamera;
 }
 @end
 
-@implementation PhotosPermission
+@implementation ATPhotosPermission
 - (enum ATPermissionType)type {
     return kATPermissionTypePhotos;
 }
 @end
 
-@implementation RemindersPermission
+@implementation ATRemindersPermission
 - (enum ATPermissionType)type {
     return kATPermissionTypeReminders;
 }
 @end
 
-@implementation BluetoothPermission
+@implementation ATBluetoothPermission
 - (enum ATPermissionType)type {
     return kATPermissionTypeBluetooth;
 }
 @end
 
-@implementation MotionPermission
+@implementation ATMotionPermission
 - (enum ATPermissionType)type {
     return kATPermissionTypeMotion;
 }
