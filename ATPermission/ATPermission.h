@@ -65,7 +65,7 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
 ///////////////////////////////////////////////////////////////////
 
 - (void)addPermission:(__kindof NSObject<ATPermissionProtocol> *)permission message:(NSString *)message;
-- (NSDictionary <NSNumber *, NSNumber *> *)permissionStatuses:(nullable NSArray <NSNumber *> *)permissionTypes;
+//- (NSDictionary <NSNumber *, NSNumber *> *)permissionStatuses:(nullable NSArray <NSNumber *> *)permissionTypes;
 - (void)statusForPermission:(enum ATPermissionType)type completion:(ATStatusRequestBlock)completion;
 - (void)show:(ATAuthTypeBlock)authChange cancelled:(ATCancelTypeBlock)cancelled;
 - (void)hide;

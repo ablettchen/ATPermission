@@ -94,7 +94,7 @@ typedef struct {
 }ATConstants;
 
 static const ATConstants at_constants = { \
-    {280.0, 260.0, 360.0}, \
+    {280.0, 260.0, 360.0, 460.0}, \
     {@"PS_requestedInUseToAlwaysUpgrade", @"PS_requestedBluetooth", @"PS_requestedMotion", @"PS_requestedNotifications"}, \
     {@"NSLocationWhenInUseUsageDescription", @"NSLocationAlwaysUsageDescription"} \
 };

@@ -100,7 +100,7 @@
     self.headerLabel.textColor = [UIColor blackColor];
     self.headerLabel.textAlignment = NSTextAlignmentCenter;
     self.headerLabel.text = @"Hey, listen!".localized;
-    self.headerLabel.accessibilityIdentifier = @"permissionscope.headerlabel";
+    self.headerLabel.accessibilityIdentifier = @"permission.headerLabel";
     
     [self.contentView addSubview:self.headerLabel];
     
@@ -110,14 +110,14 @@
     self.bodyLabel.textAlignment = NSTextAlignmentCenter;
     self.bodyLabel.text = @"We need a couple things\r\nbefore you get started.".localized;
     self.bodyLabel.numberOfLines = 2;
-    self.bodyLabel.accessibilityIdentifier = @"permissionscope.bodylabel";
+    self.bodyLabel.accessibilityIdentifier = @"permission.bodyLabel";
     
     [self.contentView addSubview:self.bodyLabel];
     
     // close button
     [self.closeButton setTitle:@"Close".localized forState:UIControlStateNormal];
     [self.closeButton addTarget:self action:@selector(cancel) forControlEvents:UIControlEventTouchUpInside];
-    self.closeButton.accessibilityIdentifier = @"permissionscope.closeButton";
+    self.closeButton.accessibilityIdentifier = @"permission.closeButton";
     
     [self.contentView addSubview:self.closeButton];
     
@@ -287,7 +287,7 @@
     
     NSString *selString = [NSString stringWithFormat:@"request%@", ATPermissionTypeDescription(type)];
     NSString *accessibilityIdentifier = \
-    [NSString stringWithFormat:@"permissionscope.button.%@", ATPermissionTypeDescription(type)].lowercaseString;
+    [NSString stringWithFormat:@"permission.button.%@", ATPermissionTypeDescription(type)].lowercaseString;
     [button addTarget:self action:NSSelectorFromString(selString) forControlEvents:UIControlEventTouchUpInside];
     button.accessibilityIdentifier = accessibilityIdentifier;
     return button;
@@ -310,44 +310,6 @@
             self.onCancel(results);
         }];
     }
-}
-
-- (void)hide {
-    UIWindow *window = UIApplication.sharedApplication.keyWindow;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [UIView animateWithDuration:0.2 animations:^{
-            self.baseView.at_top = window.at_centerY + 400;
-            self.view.alpha = 0;
-        } completion:^(BOOL finished) {
-            [self.view removeFromSuperview];
-        }];
-        if (self.notificationTimer) {
-            [self.notificationTimer invalidate];
-            self.notificationTimer = nil;
-        }
-    });
-}
-
-- (void)show:(ATAuthTypeBlock)authChange cancelled:(ATCancelTypeBlock)cancelled {
-    
-    NSAssert((self.configuredPermissions.count != 0), @"Please add at least one permission");
-    self.onAuthChange = authChange;
-    self.onCancel = cancelled;
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        while (self.waitingForBluetooth || self.waitingForMotion) {}
-        [self allAuthorized:^(BOOL areAuthorized) {
-            if (areAuthorized) {
-                [self getResultsForConfig:^(NSArray<ATPermissionResult *> * _Nonnull results) {
-                    if (self.onAuthChange) {
-                        self.onAuthChange(YES, results);
-                    }
-                }];
-            }else {
-                [self showAlert];
-            }
-        }];
-    });
 }
 
 /** Creates the modal viewcontroller and shows it. */
@@ -481,6 +443,42 @@
     self.waitingForMotion = YES;
 }
 
+- (void)allAuthorized:(void(^)(BOOL areAuthorized))completion {
+    [self getResultsForConfig:^(NSArray<ATPermissionResult *> *results) {
+        BOOL result;
+        if (results.firstObject) {
+            ATPermissionResult *obj = results.firstObject;
+            result = (obj.status != kATPermissionStatusAuthorized)?NO:YES;
+        }else {
+            result = NO;
+        }
+        completion(result);
+    }];
+}
+
+- (void)getResultsForConfig:(ATResultsForConfigBlock)completionBlock {
+    NSMutableArray <ATPermissionResult *> *results = [NSMutableArray array];
+    for (__kindof NSObject<ATPermissionProtocol> *config in self.configuredPermissions) {
+        [self statusForPermission:config.type completion:^(ATPermissionStatus status) {
+            ATPermissionResult *result = ATPermissionResultMake(config.type, status);
+            [results addObject:result];
+        }];
+    }
+    completionBlock(results);
+}
+
+- (void)detectAndCallback {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.onAuthChange) {
+            [self getResultsForConfig:^(NSArray<ATPermissionResult *> *results) {
+                [self allAuthorized:^(BOOL areAuthorized) {
+                    self.onAuthChange(areAuthorized, results);
+                }];
+            }];
+        }
+    });
+}
+
 #pragma mark - UIGestureRecognizerDelegate
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
@@ -507,28 +505,42 @@
 
 #pragma mark - Public
 
-- (void)allAuthorized:(void(^)(BOOL areAuthorized))completion {
-    [self getResultsForConfig:^(NSArray<ATPermissionResult *> *results) {
-        BOOL result;
-        if (results.firstObject) {
-            ATPermissionResult *obj = results.firstObject;
-            result = (obj.status != kATPermissionStatusAuthorized)?NO:YES;
-        }else {
-            result = NO;
-        }
-        completion(result);
-    }];
+- (void)show:(ATAuthTypeBlock)authChange cancelled:(ATCancelTypeBlock)cancelled {
+    
+    NSAssert((self.configuredPermissions.count != 0), @"Please add at least one permission");
+    self.onAuthChange = authChange;
+    self.onCancel = cancelled;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        while (self.waitingForBluetooth || self.waitingForMotion) {}
+        [self allAuthorized:^(BOOL areAuthorized) {
+            if (areAuthorized) {
+                [self getResultsForConfig:^(NSArray<ATPermissionResult *> * _Nonnull results) {
+                    if (self.onAuthChange) {
+                        self.onAuthChange(YES, results);
+                    }
+                }];
+            }else {
+                [self showAlert];
+            }
+        }];
+    });
 }
 
-- (void)getResultsForConfig:(ATResultsForConfigBlock)completionBlock {
-    NSMutableArray <ATPermissionResult *> *results = [NSMutableArray array];
-    for (__kindof NSObject<ATPermissionProtocol> *config in self.configuredPermissions) {
-        [self statusForPermission:config.type completion:^(ATPermissionStatus status) {
-            ATPermissionResult *result = ATPermissionResultMake(config.type, status);
-            [results addObject:result];
+- (void)hide {
+    UIWindow *window = UIApplication.sharedApplication.keyWindow;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [UIView animateWithDuration:0.2 animations:^{
+            self.baseView.at_top = window.at_centerY + 400;
+            self.view.alpha = 0;
+        } completion:^(BOOL finished) {
+            [self.view removeFromSuperview];
         }];
-    }
-    completionBlock(results);
+        if (self.notificationTimer) {
+            [self.notificationTimer invalidate];
+            self.notificationTimer = nil;
+        }
+    });
 }
 
 - (void)statusForPermission:(enum ATPermissionType)type completion:(ATStatusRequestBlock)completion {
@@ -569,18 +581,6 @@
         }break;
     }
     completion(permissionStatus);
-}
-
-- (void)detectAndCallback {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.onAuthChange) {
-            [self getResultsForConfig:^(NSArray<ATPermissionResult *> *results) {
-                [self allAuthorized:^(BOOL areAuthorized) {
-                    self.onAuthChange(areAuthorized, results);
-                }];
-            }];
-        }
-    });
 }
 
 - (void)addPermission:(__kindof NSObject<ATPermissionProtocol> *)permission message:(NSString *)message {
@@ -795,7 +795,7 @@
             [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
         }break;
         case kATPermissionStatusUnauthorized:{
-            [self showDisabledAlert:kATPermissionTypeNotifications];
+            [self showDeniedAlert:kATPermissionTypeNotifications];
         }break;
         case kATPermissionStatusDisabled:{
             [self showDisabledAlert:kATPermissionTypeNotifications];
