@@ -9,33 +9,6 @@
 
 #import "ATPermissionResult.h"
 
-NS_INLINE NSString *typeDescription(enum ATPermissionType type) {
-    switch (type) {
-        case kATPermissionTypeContacts:         return @"Contacts";
-        case kATPermissionTypeEvents:           return @"Events";
-        case kATPermissionTypeLocationAlways:   return @"LocationAlways";
-        case kATPermissionTypeLocationInUse:    return @"LocationInUse";
-        case kATPermissionTypeNotifications:    return @"Notifications";
-        case kATPermissionTypeMicrophone:       return @"Microphone";
-        case kATPermissionTypeCamera:           return @"Camera";
-        case kATPermissionTypePhotos:           return @"Photos";
-        case kATPermissionTypeReminders:        return @"Reminders";
-        case kATPermissionTypeBluetooth:        return @"Bluetooth";
-        case kATPermissionTypeMotion:           return @"Motion";
-        default:                                return nil;
-    }
-}
-
-NS_INLINE NSString *statusDescription(enum ATPermissionStatus status) {
-    switch (status) {
-        case kATPermissionStatusAuthorized:        return @"Authorized";
-        case kATPermissionStatusUnauthorized:      return @"Unauthorized";
-        case kATPermissionStatusUnknown:           return @"Unknown";
-        case kATPermissionStatusDisabled:          return @"Disabled"; // System-level
-        default:                                   return nil;
-    }
-}
-
 @implementation ATPermissionResult
 
 #pragma mark - lifecycle
@@ -43,7 +16,7 @@ NS_INLINE NSString *statusDescription(enum ATPermissionStatus status) {
 #pragma mark - overwrite
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"%@ %@", typeDescription(self.type), statusDescription(self.status)];
+    return [NSString stringWithFormat:@"%@ %@", ATPermissionTypeDescription(self.type), ATPermissionStatusDescription(self.status)];
 }
 
 #pragma mark - public

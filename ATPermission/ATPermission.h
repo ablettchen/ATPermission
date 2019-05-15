@@ -29,11 +29,10 @@ typedef void(^ATAuthTypeBlock)(BOOL finished, NSArray<ATPermissionResult *> *res
 typedef void(^ATCancelTypeBlock)(NSArray<ATPermissionResult *> *results);
 typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
 
-@interface ATPermission : NSObject
+@interface ATPermission : UIViewController
 
+- (void)addPermission:(__kindof NSObject<ATPermissionProtocol> *)permission message:(NSString *)message;
 - (void)statusForPermission:(enum ATPermissionType)type completion:(ATStatusRequestBlock)completion;
-- (void)requestLocationAlways;
-- (void)requestLocationInUse;
 
 @end
 
