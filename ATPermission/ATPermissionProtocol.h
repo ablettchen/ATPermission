@@ -6,7 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ATPermissionDefine.h"
+#import "ATPermissionConst.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

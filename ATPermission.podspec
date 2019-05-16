@@ -8,8 +8,8 @@
 
 Pod::Spec.new do |s|
   s.name                    = 'ATPermission'
-  s.version                 = '0.1.2'
-  s.summary                 = '系统权限请求'
+  s.version                 = '0.1.3'
+  s.summary                 = '系统权限请求, contacts, locationAlways, locationInUse, notifications, microphone, camera, photos, reminders, events, bluetooth, motion'
   s.homepage                = 'https://github.com/ablettchen/ATPermission'
   s.license                 = { :type => 'MIT', :file => 'LICENSE' }
   s.author                  = { 'ablett' => 'ablettchen@gmail.com' }
@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
   s.source_files            = 'ATPermission/**/*.{h,m}'
 
 # s.public_header_files     = 'ATPermission/**/*.{h}'
-# s.resource                = 'ATPermission/ATPermission.bundle'
+  s.resource                = 'ATPermission/ATPermission.bundle'
 
   s.requires_arc            = true
 # s.frameworks              = 'UIKit', 'Foundation'

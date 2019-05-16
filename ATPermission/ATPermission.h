@@ -17,7 +17,7 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <CoreMotion/CoreMotion.h>
 #import <Contacts/Contacts.h>
-#import "ATPermissionDefine.h"
+#import "ATPermissionConst.h"
 #import "ATPermissionResult.h"
 #import "ATPermissionProtocol.h"
 #import "ATPermissions.h"
@@ -28,6 +28,7 @@ typedef void(^ATStatusRequestBlock)(ATPermissionStatus status);
 typedef void(^ATAuthTypeBlock)(BOOL finished, NSArray<ATPermissionResult *> *results);
 typedef void(^ATCancelTypeBlock)(NSArray<ATPermissionResult *> *results);
 typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
+
 
 @interface ATPermission : UIViewController
 
@@ -60,7 +61,7 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
 @property (copy, nonatomic) ATCancelTypeBlock onCancel;
 @property (copy, nonatomic) ATCancelTypeBlock onDisabledOrDenied;
 
-@property (strong, nonatomic) UIViewController *viewControllerForAlerts;
+//@property (strong, nonatomic) UIViewController *viewControllerForAlerts;
 
 ///////////////////////////////////////////////////////////////////
 
@@ -100,6 +101,11 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
 
 ///////////////////////////////////////////////////////////////////
 
+@end
+
+@interface ATPermissionConfig : NSObject
++ (ATPermissionConfig*)globalConfig;
+@property (strong, nonatomic) NSString *languageCode;
 @end
 
 NS_ASSUME_NONNULL_END

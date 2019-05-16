@@ -9,6 +9,7 @@
 
 #import "ATPermission.h"
 #import <ATCategories/ATCategories.h>
+#import "NSString+ATPermission.h"
 
 @interface ATPermission ()<CLLocationManagerDelegate, CBPeripheralManagerDelegate, UIGestureRecognizerDelegate>
 
@@ -46,7 +47,7 @@
     self = [super init];
     if (!self) return nil;
     
-    _viewControllerForAlerts = self;
+    //_viewControllerForAlerts = self;
     
     _motionPermissionStatus     	= kATPermissionStatusUnknown;
     _configuredPermissions          = [NSMutableArray array];
@@ -99,7 +100,8 @@
     self.headerLabel.font = [UIFont systemFontOfSize:22];
     self.headerLabel.textColor = [UIColor blackColor];
     self.headerLabel.textAlignment = NSTextAlignmentCenter;
-    self.headerLabel.text = @"Hey, listen!".localized;
+    
+    self.headerLabel.text = kATPermissionHeaderText.at_localized;
     self.headerLabel.accessibilityIdentifier = @"permission.headerLabel";
     
     [self.contentView addSubview:self.headerLabel];
@@ -108,14 +110,14 @@
     self.bodyLabel.font = [UIFont systemFontOfSize:16];
     self.bodyLabel.textColor =[UIColor blackColor];
     self.bodyLabel.textAlignment = NSTextAlignmentCenter;
-    self.bodyLabel.text = @"We need a couple things\r\nbefore you get started.".localized;
+    self.bodyLabel.text = kATPermissionBodyText.at_localized;
     self.bodyLabel.numberOfLines = 2;
     self.bodyLabel.accessibilityIdentifier = @"permission.bodyLabel";
     
     [self.contentView addSubview:self.bodyLabel];
     
     // close button
-    [self.closeButton setTitle:@"Close".localized forState:UIControlStateNormal];
+    [self.closeButton setTitle:kATPermissionCloseText.at_localized forState:UIControlStateNormal];
     [self.closeButton addTarget:self action:@selector(cancel) forControlEvents:UIControlEventTouchUpInside];
     self.closeButton.accessibilityIdentifier = @"permission.closeButton";
     
@@ -180,17 +182,17 @@
         ATPermissionType type = self.configuredPermissions[index].type;
         
         [self statusForPermission:type completion:^(ATPermissionStatus currentStatus) {
-            NSString *prettyDescription = ATPermissionTypePrettyDescription(type);
+            NSString *prettyTypeTextKey = ATPermissionTypeTextPrettyKey(type);
             if (currentStatus == kATPermissionStatusAuthorized) {
                 [self setButtonAuthorizedStyle:button];
-                NSString *title = [NSString stringWithFormat:@"Allowed %@", prettyDescription].localized.uppercaseString;
+                NSString *title = [NSString stringWithFormat:@"%@ %@", kATPermissionAllowedText.at_localized, prettyTypeTextKey.at_localized].uppercaseString;
                 [button setTitle:title forState:UIControlStateNormal];
             }else if (currentStatus == kATPermissionStatusUnauthorized) {
                 [self setButtonUnauthorizedStyle:button];
-                NSString *title = [NSString stringWithFormat:@"Denied %@", prettyDescription].localized.uppercaseString;
+                NSString *title = [NSString stringWithFormat:@"%@ %@", kATPermissionDeniedText.at_localized, prettyTypeTextKey.at_localized].uppercaseString;
                 [button setTitle:title forState:UIControlStateNormal];
             }else if (currentStatus == kATPermissionStatusDisabled) {
-                NSString *title = [NSString stringWithFormat:@"%@ Disabled", prettyDescription].localized.uppercaseString;
+                NSString *title = [NSString stringWithFormat:@"%@ %@", prettyTypeTextKey.at_localized, kATPermissionDisabledText.at_localized].uppercaseString;
                 [button setTitle:title forState:UIControlStateNormal];
             }
             
@@ -273,14 +275,16 @@
     button.layer.borderColor = self.permissionButtonBorderColor.CGColor;
     button.layer.cornerRadius = self.permissionButtonCornerRadius;
     
+    NSString *prettyTypeTextKey = ATPermissionTypeTextPrettyKey(type);
+    
     switch (type) {
         case kATPermissionTypeLocationAlways:
         case kATPermissionTypeLocationInUse:{
-            NSString *title = [NSString stringWithFormat:@"Enable %@", ATPermissionTypePrettyDescription(type)];
-            [button setTitle:title.localized.uppercaseString forState:UIControlStateNormal];
+            NSString *title = [NSString stringWithFormat:@"%@ %@", kATPermissionEnableText.at_localized, prettyTypeTextKey.at_localized];
+            [button setTitle:title.uppercaseString forState:UIControlStateNormal];
         }break;
         default:{
-            NSString *title = [NSString stringWithFormat:@"Allow %@", ATPermissionTypeDescription(type)];
+            NSString *title = [NSString stringWithFormat:@"%@ %@", kATPermissionAllowedText.at_localized, prettyTypeTextKey.at_localized];
             [button setTitle:title.localized.uppercaseString forState:UIControlStateNormal];
         }break;
     }
@@ -320,7 +324,7 @@
     //hide KB if it is shown
     [window endEditing:YES];
     
-    [window addSubview:self.view];
+    [window.rootViewController.view addSubview:self.view];
     self.view.frame = window.bounds;
     self.baseView.frame = window.bounds;
     
@@ -368,17 +372,20 @@
         }];
     }
     
-    NSString *title = [NSString stringWithFormat:@"Permission for %@ was denied.", ATPermissionTypePrettyDescription(permission)].localized;
-    NSString *message = [NSString stringWithFormat:@"Please enable access to %@ in the Settings app", ATPermissionTypePrettyDescription(permission)].localized;
+    NSString *prettyTypeTextKey = ATPermissionTypeTextPrettyKey(permission);
+    
+    NSString *title = [NSString stringWithFormat:@"Permission for %@ was denied.", prettyTypeTextKey.at_localized];
+    NSString *message = [NSString stringWithFormat:@"Please enable access to %@ in the Settings app", prettyTypeTextKey.at_localized];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"OK".localized style:UIAlertActionStyleCancel handler:nil]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Show me".localized style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    [alert addAction:[UIAlertAction actionWithTitle:kATPermissionOKText.at_localized style:UIAlertActionStyleCancel handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:kATPermissionShowMeText.at_localized style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appForegroundedAfterSettings) name:UIApplicationDidBecomeActiveNotification object:nil];
         NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
         [[UIApplication sharedApplication] openURL:url];
     }]];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.viewControllerForAlerts presentViewController:alert animated:YES completion:nil];
+        [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
+        //[self.viewControllerForAlerts presentViewController:alert animated:YES completion:nil];
     });
 }
 
@@ -394,17 +401,20 @@
         }];
     }
     
-    NSString *title = [NSString stringWithFormat:@"%@  is currently disabled.", ATPermissionTypePrettyDescription(permission)].localized;
-    NSString *message = [NSString stringWithFormat:@"Please enable access to %@ in Settings", ATPermissionTypePrettyDescription(permission)].localized;
+    NSString *prettyTypeTextKey = ATPermissionTypeTextPrettyKey(permission);
+    
+    NSString *title = [NSString stringWithFormat:@"%@  is currently disabled.", prettyTypeTextKey.at_localized];
+    NSString *message = [NSString stringWithFormat:@"Please enable access to %@ in Settings", prettyTypeTextKey.at_localized];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"OK".localized style:UIAlertActionStyleCancel handler:nil]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Show me".localized style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    [alert addAction:[UIAlertAction actionWithTitle:kATPermissionOKText.at_localized style:UIAlertActionStyleCancel handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:kATPermissionShowMeText.at_localized style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appForegroundedAfterSettings) name:UIApplicationDidBecomeActiveNotification object:nil];
         NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
         [[UIApplication sharedApplication] openURL:url];
     }]];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.viewControllerForAlerts presentViewController:alert animated:YES completion:nil];
+        [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
+        //[self.viewControllerForAlerts presentViewController:alert animated:YES completion:nil];
     });
 }
 
@@ -445,13 +455,13 @@
 
 - (void)allAuthorized:(void(^)(BOOL areAuthorized))completion {
     [self getResultsForConfig:^(NSArray<ATPermissionResult *> *results) {
-        BOOL result;
-        if (results.firstObject) {
-            ATPermissionResult *obj = results.firstObject;
-            result = (obj.status != kATPermissionStatusAuthorized)?NO:YES;
-        }else {
-            result = NO;
-        }
+        __block BOOL result = YES;
+        [results enumerateObjectsUsingBlock:^(ATPermissionResult * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            if (obj.status != kATPermissionStatusAuthorized) {
+                result = NO;
+                *stop = YES;
+            }
+        }];
         completion(result);
     }];
 }
@@ -769,11 +779,12 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(100 * NSEC_PER_MSEC)), dispatch_get_main_queue(), ^{
         [self getResultsForConfig:^(NSArray<ATPermissionResult *> * _Nonnull results) {
             ATPermissionResult *obj = results.firstObject;
-            if (obj && obj.type == kATPermissionTypeNotifications) {}else {return;}
-            if (obj.status == kATPermissionStatusUnknown) {
-                [self showDeniedAlert:obj.type];
-            }else {
-                [self detectAndCallback];
+            if (obj && obj.type == kATPermissionTypeNotifications) {
+                if (obj.status == kATPermissionStatusUnknown) {
+                    [self showDeniedAlert:obj.type];
+                }else {
+                    [self detectAndCallback];
+                }
             }
         }];
     });
@@ -1038,6 +1049,19 @@
         case kATPermissionStatusDisabled: {}break;
         case kATPermissionStatusAuthorized: {}break;
     }
+}
+
+@end
+
+@implementation ATPermissionConfig
+
++ (ATPermissionConfig*)globalConfig {
+    static ATPermissionConfig *config;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        config = [ATPermissionConfig new];
+    });
+    return config;
 }
 
 @end

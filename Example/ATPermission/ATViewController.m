@@ -27,9 +27,9 @@
     self.multiPermission    = [ATPermission new];
     self.noUIPermission     = [ATPermission new];
     
-    self.singlePermission.viewControllerForAlerts = self;
-    self.multiPermission.viewControllerForAlerts = self;
-    self.noUIPermission.viewControllerForAlerts = self;
+    //self.singlePermission.viewControllerForAlerts = self;
+    //self.multiPermission.viewControllerForAlerts = self;
+    //self.noUIPermission.viewControllerForAlerts = self;
     
     [self.singlePermission addPermission:[[ATNotificationsPermission alloc] initWithNotificationCategories:nil]
                                  message:@"We use this to send you\r\nspam and love notes"];
@@ -155,7 +155,7 @@
 
 - (void)statusContactsPermissionAction:(UIButton *)sender {
     ATPermission *p = [ATPermission new];
-    p.viewControllerForAlerts = self;
+    //p.viewControllerForAlerts = self;
     ATPermissionStatus status = [p statusContacts];
     if (status != kATPermissionStatusAuthorized) {
         [p requestContacts];
