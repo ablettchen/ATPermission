@@ -285,7 +285,7 @@
         }break;
         default:{
             NSString *title = [NSString stringWithFormat:@"%@ %@", kATPermissionAllowedText.at_localized, prettyTypeTextKey.at_localized];
-            [button setTitle:title.localized.uppercaseString forState:UIControlStateNormal];
+            [button setTitle:title.uppercaseString forState:UIControlStateNormal];
         }break;
     }
     

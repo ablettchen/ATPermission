@@ -53,11 +53,12 @@
         UIButton *view = [UIButton buttonWithType:UIButtonTypeCustom];
         [self.view addSubview:view];
         view.at_size = CGSizeMake(200, 50);
-        view.at_top = self.view.at_top + 100;
+        view.at_top = self.view.at_top + (IS_IPHONE_X?135:100);
         view.at_centerX = self.view.at_centerX;
         [view setTitle:@"Single permission" forState:UIControlStateNormal];
         [view setTitleColor:UIColorHex(0x0067d8FF) forState:UIControlStateNormal];
-        [view setBackgroundImage:[UIImage imageWithColor:UIColorHex(0xF5F5F5FF)] forState:UIControlStateHighlighted];
+        [view setTitleColor:UIColorHex(0xFFFFFFFF) forState:UIControlStateHighlighted];
+        [view setBackgroundImage:[UIImage imageWithColor:UIColorHex(0x0067d8FF)] forState:UIControlStateHighlighted];
         [view.titleLabel setFont:[UIFont systemFontOfSize:18]];
         view.layer.borderWidth = 1.f;
         view.layer.borderColor = UIColorHex(0x0067d8FF).CGColor;
@@ -74,7 +75,8 @@
         view.at_centerX = singleBtn.at_centerX;
         [view setTitle:@"Multiple permission" forState:UIControlStateNormal];
         [view setTitleColor:UIColorHex(0x0067d8FF) forState:UIControlStateNormal];
-        [view setBackgroundImage:[UIImage imageWithColor:UIColorHex(0xF5F5F5FF)] forState:UIControlStateHighlighted];
+        [view setTitleColor:UIColorHex(0xFFFFFFFF) forState:UIControlStateHighlighted];
+        [view setBackgroundImage:[UIImage imageWithColor:UIColorHex(0x0067d8FF)] forState:UIControlStateHighlighted];
         [view.titleLabel setFont:[UIFont systemFontOfSize:18]];
         view.layer.borderWidth = 1.f;
         view.layer.borderColor = UIColorHex(0x0067d8FF).CGColor;
@@ -91,7 +93,8 @@
         view.at_centerX = multipleBtn.at_centerX;
         [view setTitle:@"No UI permission" forState:UIControlStateNormal];
         [view setTitleColor:UIColorHex(0x0067d8FF) forState:UIControlStateNormal];
-        [view setBackgroundImage:[UIImage imageWithColor:UIColorHex(0xF5F5F5FF)] forState:UIControlStateHighlighted];
+        [view setTitleColor:UIColorHex(0xFFFFFFFF) forState:UIControlStateHighlighted];
+        [view setBackgroundImage:[UIImage imageWithColor:UIColorHex(0x0067d8FF)] forState:UIControlStateHighlighted];
         [view.titleLabel setFont:[UIFont systemFontOfSize:18]];
         view.layer.borderWidth = 1.f;
         view.layer.borderColor = UIColorHex(0x0067d8FF).CGColor;
