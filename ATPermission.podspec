@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name                    = 'ATPermission'
-  s.version                 = '0.1.4'
+  s.version                 = '0.1.5'
   s.summary                 = '系统权限请求'
   s.homepage                = 'https://github.com/ablettchen/ATPermission'
   s.license                 = { :type => 'MIT', :file => 'LICENSE' }
