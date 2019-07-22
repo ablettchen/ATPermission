@@ -59,7 +59,7 @@
 	<string>需要为您添加图片或视频</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>请点击“好”以允许访问。
-        若不允许, 你将无法上传本地相册图片及视频内容。</string>
+        若不允许, 你将无法上传本地照片图片及视频内容。</string>
 	<key>NSRemindersUsageDescription</key>
 	<string>请点击“好”以允许访问。
         若不允许, 你将无法使用访问提醒事项</string>

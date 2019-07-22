@@ -154,7 +154,6 @@
 
 - (void)statusContactsPermissionAction:(UIButton *)sender {
     ATPermission *p = [ATPermission new];
-    //p.viewControllerForAlerts = self;
     ATPermissionStatus status = [p statusContacts];
     if (status != kATPermissionStatusAuthorized) {
         [p requestContacts];

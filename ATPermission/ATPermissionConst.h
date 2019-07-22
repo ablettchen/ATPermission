@@ -89,30 +89,8 @@ typedef struct {
     ATConstantsInfoPlistKeys InfoPlistKeys;
 }ATConstants;
 
-NS_INLINE NSString *ATPermissionTypeTextPrettyKey(enum ATPermissionType type) {
-    return [NSString stringWithFormat:@"kATPermission%@Text", ATPermissionTypePrettyDescription(type)];
-}
 
 UIKIT_EXTERN ATConstants const at_constants;
 
-UIKIT_EXTERN NSString *const kATPermissionOKText;            ///< 好
-UIKIT_EXTERN NSString *const kATPermissionShowMeText;        ///< 去设置
-UIKIT_EXTERN NSString *const kATPermissionCloseText;        ///< 关闭
-UIKIT_EXTERN NSString *const kATPermissionHeaderText;       ///< 标题
-UIKIT_EXTERN NSString *const kATPermissionBodyText;         ///< 描述
-UIKIT_EXTERN NSString *const kATPermissionAllowedText;      ///< 允许
-UIKIT_EXTERN NSString *const kATPermissionEnableText;       ///< 打开
-UIKIT_EXTERN NSString *const kATPermissionDeniedText;       ///< 拒绝
-UIKIT_EXTERN NSString *const kATPermissionDisabledText;     ///< 不可见
-UIKIT_EXTERN NSString *const kATPermissionContactsText;
-UIKIT_EXTERN NSString *const kATPermissionEventsText;
-UIKIT_EXTERN NSString *const kATPermissionLocationText;
-UIKIT_EXTERN NSString *const kATPermissionNotificationsText;
-UIKIT_EXTERN NSString *const kATPermissionMicrophoneText;
-UIKIT_EXTERN NSString *const kATPermissionCameraText;
-UIKIT_EXTERN NSString *const kATPermissionPhotosText;
-UIKIT_EXTERN NSString *const kATPermissionRemindersText;
-UIKIT_EXTERN NSString *const kATPermissionBluetoothText;
-UIKIT_EXTERN NSString *const kATPermissionMotionText;
 
 

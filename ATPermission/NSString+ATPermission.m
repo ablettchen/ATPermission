@@ -13,7 +13,8 @@
 
 - (NSString *)at_localized {
     NSBundle *permissionBundle = [NSBundle at_bundleForClass:[ATPermission class] resource:@"ATPermission" ofType:@"bundle"];
-    return [permissionBundle at_localizedStringForKey:self];
+    NSString *ss = [permissionBundle at_localizedStringForKey:self language:@"zh-Hans"];
+    return ss;
 }
 
 @end
