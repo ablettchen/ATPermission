@@ -10,6 +10,8 @@
 #import "ATPermission.h"
 #import <ATCategories/ATCategories.h>
 #import "NSString+ATPermission.h"
+#import <ATAlert/ATAlertView.h>
+#import <ATAlert/UIView+ATAlertView.h>
 
 @interface ATPermission ()<CLLocationManagerDelegate, CBPeripheralManagerDelegate, UIGestureRecognizerDelegate>
 
@@ -49,7 +51,9 @@
     
     //_viewControllerForAlerts = self;
     
-    _motionPermissionStatus     	= kATPermissionStatusUnknown;
+    _alertInView = [UIApplication sharedApplication].keyWindow.rootViewController.view;
+    
+    _motionPermissionStatus         = kATPermissionStatusUnknown;
     _configuredPermissions          = [NSMutableArray array];
     _permissionMessages             = [NSMutableDictionary dictionary];
     _permissionButtons              = [NSMutableArray array];
@@ -377,15 +381,18 @@
     
     NSString *title = [NSString stringWithFormat:@"Permission for %@ was denied.", prettyDescription].at_localized;
     NSString *message = [NSString stringWithFormat:@"Please enable access to %@ in the Settings app", prettyDescription].at_localized;
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"OK".at_localized style:UIAlertActionStyleCancel handler:nil]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Show me".at_localized style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    NSArray *actions = @[ATAlertNormalActionMake(@"OK".at_localized, nil), ATAlertHilightedActionMake(@"Show me".at_localized, ^(ATAlertAction * _Nonnull action) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appForegroundedAfterSettings) name:UIApplicationDidBecomeActiveNotification object:nil];
         NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
         [[UIApplication sharedApplication] openURL:url];
-    }]];
+    })];
+    ATAlertView *alert = [ATAlertView alertWithTitle:title message:message actions:actions];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
+        if (self.alertInView) {
+            [alert showIn:self.alertInView];
+        }else {
+            [alert show];
+        }
     });
 }
 
@@ -405,15 +412,18 @@
     
     NSString *title = [NSString stringWithFormat:@"%@ is currently disabled.", prettyDescription].at_localized;
     NSString *message = [NSString stringWithFormat:@"Please enable access to %@ in Settings", prettyDescription].at_localized;
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"OK".at_localized style:UIAlertActionStyleCancel handler:nil]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Show me".at_localized style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    NSArray *actions = @[ATAlertNormalActionMake(@"OK".at_localized, nil), ATAlertHilightedActionMake(@"Show me".at_localized, ^(ATAlertAction * _Nonnull action) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appForegroundedAfterSettings) name:UIApplicationDidBecomeActiveNotification object:nil];
         NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
         [[UIApplication sharedApplication] openURL:url];
-    }]];
+    })];
+    ATAlertView *alert = [ATAlertView alertWithTitle:title message:message actions:actions];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
+        if (self.alertInView) {
+            [alert showIn:self.alertInView];
+        }else {
+            [alert show];
+        }
     });
 }
 
@@ -732,7 +742,7 @@
             if (@available(iOS 9.0, *)) {
                 [[CNContactStore new] requestAccessForEntityType:CNEntityTypeContacts completionHandler:^(BOOL granted, NSError * _Nullable error) {
                     [self detectAndCallback];
-                 }];
+                }];
             }else {
                 ABAddressBookRequestAccessWithCompletion(nil, ^(bool granted, CFErrorRef error) {
                     [self detectAndCallback];
