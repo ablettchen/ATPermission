@@ -565,39 +565,50 @@
 - (void)statusForPermission:(enum ATPermissionType)type completion:(ATStatusRequestBlock)completion {
     ATPermissionStatus permissionStatus = kATPermissionStatusUnknown;
     switch (type) {
-        case kATPermissionTypeLocationAlways:{
+        case kATPermissionTypeLocationAlways: {
             permissionStatus = [self statusLocationAlways];
-        }break;
-        case kATPermissionTypeLocationInUse:{
+            break;
+        }
+        case kATPermissionTypeLocationInUse: {
             permissionStatus = [self statusLocationInUse];
-        }break;
-        case kATPermissionTypeContacts:{
+            break;
+        }
+        case kATPermissionTypeContacts: {
             permissionStatus = [self statusContacts];
-        }break;
-        case kATPermissionTypeNotifications:{
+            break;
+        }
+        case kATPermissionTypeNotifications: {
             permissionStatus = [self statusNotifications];
-        }break;
-        case kATPermissionTypeMicrophone:{
+            break;
+        }
+        case kATPermissionTypeMicrophone: {
             permissionStatus = [self statusMicrophone];
-        }break;
-        case kATPermissionTypeCamera:{
+            break;
+        }
+        case kATPermissionTypeCamera: {
             permissionStatus = [self statusCamera];
-        }break;
-        case kATPermissionTypePhotos:{
+            break;
+        }
+        case kATPermissionTypePhotos: {
             permissionStatus = [self statusPhotos];
-        }break;
-        case kATPermissionTypeReminders:{
+            break;
+        }
+        case kATPermissionTypeReminders: {
             permissionStatus = [self statusReminders];
-        }break;
-        case kATPermissionTypeEvents:{
+            break;
+        }
+        case kATPermissionTypeEvents: {
             permissionStatus = [self statusEvents];
-        }break;
-        case kATPermissionTypeBluetooth:{
+            break;
+        }
+        case kATPermissionTypeBluetooth: {
             permissionStatus = [self statusBluetooth];
-        }break;
-        case kATPermissionTypeMotion:{
+            break;
+        }
+        case kATPermissionTypeMotion: {
             permissionStatus = [self statusMotion];
-        }break;
+            break;
+        }
     }
     completion(permissionStatus);
 }
@@ -627,13 +638,14 @@
     if (!CLLocationManager.locationServicesEnabled) {return kATPermissionStatusDisabled;}
     CLAuthorizationStatus status = CLLocationManager.authorizationStatus;
     switch (status) {
-        case kCLAuthorizationStatusAuthorizedAlways:{
+        case kCLAuthorizationStatusAuthorizedAlways: {
             return kATPermissionStatusAuthorized;
-        }break;
+            break;
+        }
         case kCLAuthorizationStatusRestricted:
         case kCLAuthorizationStatusDenied:
             return kATPermissionStatusUnauthorized;
-        case kCLAuthorizationStatusAuthorizedWhenInUse:{
+        case kCLAuthorizationStatusAuthorizedWhenInUse: {
             BOOL value = [self.defaults boolForKey:at_constants.NSUserDefaultsKeys.requestedInUseToAlwaysUpgrade];
             if (value) {
                 return kATPermissionStatusUnauthorized;
@@ -652,21 +664,23 @@
     NSAssert(hasAlwaysKey, desc);
     ATPermissionStatus status = [self statusLocationAlways];
     switch (status) {
-        case kATPermissionStatusUnknown:{
+        case kATPermissionStatusUnknown: {
             if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse) {
                 [self.defaults setBool:YES forKey:at_constants.NSUserDefaultsKeys.requestedInUseToAlwaysUpgrade];
                 [self.defaults synchronize];
             }
             [self.locationManager requestAlwaysAuthorization];
-        }break;
-        case kATPermissionStatusUnauthorized:{
-            [self showDeniedAlert:kATPermissionTypeLocationAlways];
-        }break;
-        case kATPermissionStatusDisabled:{
-            [self showDisabledAlert:kATPermissionTypeLocationInUse];
-        }break;
-        default:
             break;
+        }
+        case kATPermissionStatusUnauthorized: {
+            [self showDeniedAlert:kATPermissionTypeLocationAlways];
+            break;
+        }
+        case kATPermissionStatusDisabled: {
+            [self showDisabledAlert:kATPermissionTypeLocationInUse];
+            break;
+        }
+        default: break;
     }
 }
 
@@ -688,72 +702,56 @@
 }
 
 - (void)requestLocationInUse {
-    BOOL hasWhenInUseKey = [[NSBundle mainBundle] objectForInfoDictionaryKey:at_constants.InfoPlistKeys.locationAlways]?YES:NO;
+    BOOL hasWhenInUseKey = [[NSBundle mainBundle] objectForInfoDictionaryKey:at_constants.InfoPlistKeys.locationAlways] ? YES : NO;
     NSString *desc = [NSString stringWithFormat:@"%@  not found in Info.plist.", at_constants.InfoPlistKeys.locationWhenInUse];
     NSAssert(hasWhenInUseKey, desc);
     ATPermissionStatus status = [self statusLocationInUse];
     switch (status) {
-        case kATPermissionStatusUnknown:{
+        case kATPermissionStatusUnknown: {
             [self.locationManager requestWhenInUseAuthorization];
-        }break;
-        case kATPermissionStatusUnauthorized:{
-            [self showDeniedAlert:kATPermissionTypeLocationInUse];
-        }break;
-        case kATPermissionStatusDisabled:{
-            [self showDisabledAlert:kATPermissionTypeLocationInUse];
-        }break;
-        default:
             break;
+        }
+        case kATPermissionStatusUnauthorized: {
+            [self showDeniedAlert:kATPermissionTypeLocationInUse];
+            break;
+        }
+        case kATPermissionStatusDisabled: {
+            [self showDisabledAlert:kATPermissionTypeLocationInUse];
+            break;
+        }
+        default: break;
     }
 }
 
 #pragma mark - Contacts
 
 - (ATPermissionStatus)statusContacts {
-    if (@available(iOS 9.0, *)) {
-        CNAuthorizationStatus status = [CNContactStore authorizationStatusForEntityType:CNEntityTypeContacts];
-        switch (status) {
-            case CNAuthorizationStatusAuthorized:
-                return kATPermissionStatusAuthorized;
-            case CNAuthorizationStatusRestricted:
-            case CNAuthorizationStatusDenied:
-                return kATPermissionStatusUnauthorized;
-            case CNAuthorizationStatusNotDetermined:
-                return kATPermissionStatusUnknown;
-        }
-    }else {
-        ABAuthorizationStatus status = ABAddressBookGetAuthorizationStatus();
-        switch (status) {
-            case kABAuthorizationStatusAuthorized:
-                return kATPermissionStatusAuthorized;
-            case kABAuthorizationStatusRestricted:
-            case kABAuthorizationStatusDenied:
-                return kATPermissionStatusUnauthorized;
-            case kABAuthorizationStatusNotDetermined:
-                return kATPermissionStatusUnknown;
-        }
+    CNAuthorizationStatus status = [CNContactStore authorizationStatusForEntityType:CNEntityTypeContacts];
+    switch (status) {
+        case CNAuthorizationStatusAuthorized:
+            return kATPermissionStatusAuthorized;
+        case CNAuthorizationStatusRestricted:
+        case CNAuthorizationStatusDenied:
+            return kATPermissionStatusUnauthorized;
+        case CNAuthorizationStatusNotDetermined:
+            return kATPermissionStatusUnknown;
     }
 }
 
 - (void)requestContacts {
     ATPermissionStatus status = [self statusContacts];
     switch (status) {
-        case kATPermissionStatusUnknown:{
-            if (@available(iOS 9.0, *)) {
-                [[CNContactStore new] requestAccessForEntityType:CNEntityTypeContacts completionHandler:^(BOOL granted, NSError * _Nullable error) {
-                    [self detectAndCallback];
-                }];
-            }else {
-                ABAddressBookRequestAccessWithCompletion(nil, ^(bool granted, CFErrorRef error) {
-                    [self detectAndCallback];
-                });
-            }
-        }break;
-        case kATPermissionStatusUnauthorized:{
-            [self showDisabledAlert:kATPermissionTypeContacts];
-        }break;
-        default:
+        case kATPermissionStatusUnknown: {
+            [[CNContactStore new] requestAccessForEntityType:CNEntityTypeContacts completionHandler:^(BOOL granted, NSError * _Nullable error) {
+                [self detectAndCallback];
+            }];
             break;
+        }
+        case kATPermissionStatusUnauthorized: {
+            [self showDisabledAlert:kATPermissionTypeContacts];
+            break;
+        }
+        default: break;
     }
 }
 
@@ -802,7 +800,7 @@
 - (void)requestNotifications {
     ATPermissionStatus status = [self statusNotifications];
     switch (status) {
-        case kATPermissionStatusUnknown:{
+        case kATPermissionStatusUnknown: {
             ATNotificationsPermission *notificationsPermission;
             if ([self.configuredPermissions.firstObject isKindOfClass:[ATNotificationsPermission class]]) {
                 notificationsPermission = self.configuredPermissions.firstObject;
@@ -813,18 +811,21 @@
             UIUserNotificationType type = UIUserNotificationTypeBadge|UIUserNotificationTypeSound|UIUserNotificationTypeAlert;
             UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:type categories:notificationsPermissionSet];
             [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
-        }break;
-        case kATPermissionStatusUnauthorized:{
-            [self showDeniedAlert:kATPermissionTypeNotifications];
-        }break;
-        case kATPermissionStatusDisabled:{
-            [self showDisabledAlert:kATPermissionTypeNotifications];
-        }break;
-        case kATPermissionStatusAuthorized:{
-            [self detectAndCallback];
-        }break;
-        default:
             break;
+        }
+        case kATPermissionStatusUnauthorized: {
+            [self showDeniedAlert:kATPermissionTypeNotifications];
+            break;
+        }
+        case kATPermissionStatusDisabled: {
+            [self showDisabledAlert:kATPermissionTypeNotifications];
+            break;
+        }
+        case kATPermissionStatusAuthorized: {
+            [self detectAndCallback];
+            break;
+        }
+        default: break;
     }
 }
 
@@ -845,19 +846,26 @@
 - (void)requestMicrophone {
     ATPermissionStatus status = [self statusMicrophone];
     switch (status) {
-        case kATPermissionStatusUnknown:{
+        case kATPermissionStatusUnknown: {
             [[AVAudioSession sharedInstance] requestRecordPermission:^(BOOL granted) {
                 [self detectAndCallback];
             }];
-        }break;
-        case kATPermissionStatusUnauthorized:{
+            break;
+        }
+        case kATPermissionStatusUnauthorized: {
             [self showDeniedAlert:kATPermissionTypeMicrophone];
-        }break;
-        case kATPermissionStatusDisabled:{
+            break;
+        }
+        case kATPermissionStatusDisabled: {
             [self showDisabledAlert:kATPermissionTypeMicrophone];
-        }break;
-        case kATPermissionStatusAuthorized:{
-        }break;
+            break;
+        }
+        case kATPermissionStatusAuthorized: {
+            break;
+        }
+        case kATPermissionStatusLimited: {
+            break;
+        }
     }
 }
 
@@ -879,19 +887,26 @@
 - (void)requestCamera {
     ATPermissionStatus status = [self statusCamera];
     switch (status) {
-        case kATPermissionStatusUnknown:{
+        case kATPermissionStatusUnknown: {
             [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
                 [self detectAndCallback];
             }];
-        }break;
-        case kATPermissionStatusUnauthorized:{
+            break;
+        }
+        case kATPermissionStatusUnauthorized: {
             [self showDeniedAlert:kATPermissionTypeCamera];
-        }break;
-        case kATPermissionStatusDisabled:{
+            break;
+        }
+        case kATPermissionStatusDisabled: {
             [self showDisabledAlert:kATPermissionTypeCamera];
-        }break;
-        case kATPermissionStatusAuthorized:{
-        }break;
+            break;
+        }
+        case kATPermissionStatusAuthorized: {
+            break;
+        }
+        case kATPermissionStatusLimited: {
+            break;
+        }
     }
 }
 
@@ -907,25 +922,40 @@
             return kATPermissionStatusUnauthorized;
         case PHAuthorizationStatusNotDetermined:
             return kATPermissionStatusUnknown;
+        case PHAuthorizationStatusLimited:
+            return kATPermissionStatusLimited;
+        default:
+            return kATPermissionStatusUnknown;
     }
 }
 
 - (void)requestPhotos {
     ATPermissionStatus status = [self statusPhotos];
     switch (status) {
-        case kATPermissionStatusUnknown:{
+        case kATPermissionStatusUnknown: {
             [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
                 [self detectAndCallback];
             }];
-        }break;
-        case kATPermissionStatusUnauthorized:{
+            break;
+        }
+            
+        case kATPermissionStatusUnauthorized: {
             [self showDeniedAlert:kATPermissionTypePhotos];
-        }break;
-        case kATPermissionStatusDisabled:{
+            break;
+        }
+            
+        case kATPermissionStatusDisabled: {
             [self showDisabledAlert:kATPermissionTypePhotos];
-        }break;
-        case kATPermissionStatusAuthorized:{
-        }break;
+            break;
+        }
+            
+        case kATPermissionStatusAuthorized: {
+            break;
+        }
+            
+        case kATPermissionStatusLimited: {
+            break;
+        }
     }
 }
 
@@ -947,16 +977,25 @@
 - (void)requestReminders {
     ATPermissionStatus status = [self statusReminders];
     switch (status) {
-        case kATPermissionStatusUnknown:{
+        case kATPermissionStatusUnknown: {
             [[EKEventStore new] requestAccessToEntityType:EKEntityTypeReminder completion:^(BOOL granted, NSError * _Nullable error) {
                 [self detectAndCallback];
             }];
-        }break;
-        case kATPermissionStatusUnauthorized:{
+            break;
+        }
+        case kATPermissionStatusUnauthorized: {
             [self showDeniedAlert:kATPermissionTypeReminders];
-        }break;
-        case kATPermissionStatusDisabled: {}break;
-        case kATPermissionStatusAuthorized: {}break;
+            break;
+        }
+        case kATPermissionStatusDisabled: {
+            break;
+        }
+        case kATPermissionStatusAuthorized: {
+            break;
+        }
+        case kATPermissionStatusLimited: {
+            break;
+        }
     }
 }
 
@@ -978,16 +1017,25 @@
 - (void)requestEvents {
     ATPermissionStatus status = [self statusEvents];
     switch (status) {
-        case kATPermissionStatusUnknown:{
+        case kATPermissionStatusUnknown: {
             [[EKEventStore new] requestAccessToEntityType:EKEntityTypeEvent completion:^(BOOL granted, NSError * _Nullable error) {
                 [self detectAndCallback];
             }];
-        }break;
-        case kATPermissionStatusUnauthorized:{
+            break;
+        }
+        case kATPermissionStatusUnauthorized: {
             [self showDeniedAlert:kATPermissionTypeEvents];
-        }break;
-        case kATPermissionStatusDisabled: {}break;
-        case kATPermissionStatusAuthorized: {}break;
+            break;
+        }
+        case kATPermissionStatusDisabled: {
+            break;
+        }
+        case kATPermissionStatusAuthorized: {
+            break;
+        }
+        case kATPermissionStatusLimited: {
+            break;
+        }
     }
 }
 
@@ -1024,16 +1072,24 @@
 - (void)requestBluetooth {
     ATPermissionStatus status = [self statusBluetooth];
     switch (status) {
-        case kATPermissionStatusUnknown:{
+        case kATPermissionStatusUnknown: {
             [self triggerBluetoothStatusUpdate];
-        }break;
-        case kATPermissionStatusUnauthorized:{
+            break;
+        }
+        case kATPermissionStatusUnauthorized: {
             [self showDeniedAlert:kATPermissionTypeBluetooth];
-        }break;
-        case kATPermissionStatusDisabled:{
+            break;
+        }
+        case kATPermissionStatusDisabled: {
             [self showDisabledAlert:kATPermissionTypeBluetooth];
-        }break;
-        case kATPermissionStatusAuthorized:{}break;
+            break;
+        }
+        case kATPermissionStatusAuthorized: {
+            break;
+        }
+        case kATPermissionStatusLimited: {
+            break;
+        }
     }
 }
 
@@ -1049,14 +1105,23 @@
 - (void)requestMotion {
     ATPermissionStatus status = [self statusMotion];
     switch (status) {
-        case kATPermissionStatusUnknown:{
+        case kATPermissionStatusUnknown: {
             [self triggerMotionStatusUpdate];
-        }break;
-        case kATPermissionStatusUnauthorized:{
+            break;
+        }
+        case kATPermissionStatusUnauthorized: {
             [self showDeniedAlert:kATPermissionTypeMotion];
-        }break;
-        case kATPermissionStatusDisabled: {}break;
-        case kATPermissionStatusAuthorized: {}break;
+            break;
+        }
+        case kATPermissionStatusDisabled: {
+            break;
+        }
+        case kATPermissionStatusAuthorized: {
+            break;
+        }
+        case kATPermissionStatusLimited: {
+            break;
+        }
     }
 }
 

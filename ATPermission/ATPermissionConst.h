@@ -51,7 +51,8 @@ typedef NS_ENUM(NSUInteger, ATPermissionStatus) {
     kATPermissionStatusAuthorized,
     kATPermissionStatusUnauthorized,
     kATPermissionStatusUnknown,
-    kATPermissionStatusDisabled
+    kATPermissionStatusDisabled,
+    kATPermissionStatusLimited,
 };
 
 NS_INLINE NSString *ATPermissionStatusDescription(enum ATPermissionStatus status) {
