@@ -8,23 +8,17 @@
 
 Pod::Spec.new do |s|
   s.name                    = 'ATPermission'
-  s.version                 = '0.1.7'
+  s.version                 = '0.1.8'
   s.summary                 = '系统权限请求'
   s.homepage                = 'https://github.com/ablettchen/ATPermission'
   s.license                 = { :type => 'MIT', :file => 'LICENSE' }
   s.author                  = { 'ablett' => 'ablettchen@gmail.com' }
   s.source                  = { :git => 'https://github.com/ablettchen/ATPermission.git', :tag => s.version.to_s }
   s.social_media_url        = 'https://twitter.com/ablettchen'
-  s.ios.deployment_target   = '9.0'
-
+  s.ios.deployment_target   = '10.0'
   s.source_files            = 'ATPermission/**/*.{h,m}'
-
-# s.public_header_files     = 'ATPermission/**/*.{h}'
   s.resource                = 'ATPermission/ATPermission.bundle'
-
   s.requires_arc            = true
-# s.frameworks              = 'UIKit', 'Foundation'
-
   s.dependency 'ATAlert'
   s.dependency 'ATCategories'
 

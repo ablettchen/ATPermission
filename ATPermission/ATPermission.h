@@ -34,8 +34,6 @@ typedef void(^ATResultsForConfigBlock)(NSArray<ATPermissionResult *> *results);
 
 ///////////////////////////////////////////////////////////////////
 
-@property (strong, nonatomic) UIView *alertInView;
-
 @property (strong, nonatomic) UILabel *headerLabel;
 @property (strong, nonatomic) UILabel *bodyLabel;
 @property (strong, nonatomic) UIColor *closeButtonTextColor;

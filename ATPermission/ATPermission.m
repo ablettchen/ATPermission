@@ -51,8 +51,6 @@
     
     //_viewControllerForAlerts = self;
     
-    _alertInView = [UIApplication sharedApplication].keyWindow.rootViewController.view;
-    
     _motionPermissionStatus         = kATPermissionStatusUnknown;
     _configuredPermissions          = [NSMutableArray array];
     _permissionMessages             = [NSMutableDictionary dictionary];
@@ -388,11 +386,7 @@
     })];
     ATAlertView *alert = [ATAlertView alertWithTitle:title message:message actions:actions];
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.alertInView) {
-            [alert showIn:self.alertInView];
-        }else {
-            [alert show];
-        }
+        [alert show];
     });
 }
 
@@ -419,11 +413,7 @@
     })];
     ATAlertView *alert = [ATAlertView alertWithTitle:title message:message actions:actions];
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.alertInView) {
-            [alert showIn:self.alertInView];
-        }else {
-            [alert show];
-        }
+        [alert show];
     });
 }
 
