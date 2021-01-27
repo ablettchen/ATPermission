@@ -606,8 +606,8 @@
 - (void)addPermission:(__kindof NSObject<ATPermissionProtocol> *)permission message:(NSString *)message {
     NSAssert(!(message.length == 0), @"Including a message about your permission usage is helpful");
     NSAssert((self.configuredPermissions.count < 3), @"Ask for three or fewer permissions at a time");
-    __kindof NSObject<ATPermissionProtocol> *obj = self.configuredPermissions.firstObject;
-    NSString *string = [NSString stringWithFormat:@"Permission for %@ already set", ATPermissionTypeDescription(permission.type)];
+    __unused __kindof NSObject<ATPermissionProtocol> *obj = self.configuredPermissions.firstObject;
+    __unused NSString *string = [NSString stringWithFormat:@"Permission for %@ already set", ATPermissionTypeDescription(permission.type)];
     NSAssert(((obj && (obj.type == permission.type)) ? NO : YES), string);
     
     [self.configuredPermissions addObject:permission];
@@ -649,8 +649,8 @@
 }
 
 - (void)requestLocationAlways {
-    BOOL hasAlwaysKey = [[NSBundle mainBundle] objectForInfoDictionaryKey:at_constants.InfoPlistKeys.locationAlways]?YES:NO;
-    NSString *desc = [NSString stringWithFormat:@"%@  not found in Info.plist.", at_constants.InfoPlistKeys.locationAlways];
+    __unused BOOL hasAlwaysKey = [[NSBundle mainBundle] objectForInfoDictionaryKey:at_constants.InfoPlistKeys.locationAlways]?YES:NO;
+    __unused NSString *desc = [NSString stringWithFormat:@"%@  not found in Info.plist.", at_constants.InfoPlistKeys.locationAlways];
     NSAssert(hasAlwaysKey, desc);
     ATPermissionStatus status = [self statusLocationAlways];
     switch (status) {
@@ -692,8 +692,8 @@
 }
 
 - (void)requestLocationInUse {
-    BOOL hasWhenInUseKey = [[NSBundle mainBundle] objectForInfoDictionaryKey:at_constants.InfoPlistKeys.locationAlways] ? YES : NO;
-    NSString *desc = [NSString stringWithFormat:@"%@  not found in Info.plist.", at_constants.InfoPlistKeys.locationWhenInUse];
+    __unused BOOL hasWhenInUseKey = [[NSBundle mainBundle] objectForInfoDictionaryKey:at_constants.InfoPlistKeys.locationAlways] ? YES : NO;
+    __unused NSString *desc = [NSString stringWithFormat:@"%@  not found in Info.plist.", at_constants.InfoPlistKeys.locationWhenInUse];
     NSAssert(hasWhenInUseKey, desc);
     ATPermissionStatus status = [self statusLocationInUse];
     switch (status) {
